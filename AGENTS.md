@@ -22,8 +22,9 @@ are covered offline.
 ## Layout
 
 ```
+conftest.py                 pytest options only (rootdir: always parsed first)
 tests/
-  conftest.py               fixtures + --offline / --expected-version options
+  conftest.py               fixtures + JSON report hooks (--report-file)
   helpers.py                retry helper, console-script helpers, xfail reasons
   test_packaging.py         installed distribution metadata / version gate
   test_api_offline.py       imports, constants, models, invalid-input errors
@@ -31,7 +32,11 @@ tests/
   test_detect_online.py     real language detection (network)
   test_cli.py               'translate' console script
 scripts/install_target.py   installs the package under test (git/local/wheel/pypi)
+dashboard/                  Vite app that renders a pytest report as a web page
+  src/                      main.js + style.css (no framework)
+  public/results.json       report data consumed by the app
 .github/workflows/test.yml  CI: offline on push/PR, online nightly + manual
+.github/workflows/pages.yml CI: test, build dashboard, deploy to GitHub Pages
 ```
 
 ## Environment setup (fresh clone)
@@ -59,6 +64,9 @@ installed.
 | Offline only | `python -m pytest --offline` |
 | Network only | `python -m pytest -m online` |
 | Release gate | `python -m pytest --expected-version 4.0.3` |
+| Write dashboard data | `python -m pytest --report-file dashboard/public/results.json` |
+| Dashboard dev server | `cd dashboard && npm install && npm run dev` |
+| Test the built dashboard | `cd dashboard && npm run build && npm run preview` |
 | Show installed target | `python scripts/install_target.py show` |
 | Test a local fix | `python scripts/install_target.py local ../googletrans-curl` |
 | Test a built wheel | `python scripts/install_target.py wheel dist/googletrans_curl-4.0.3-py3-none-any.whl` |
@@ -89,6 +97,36 @@ Tests accept either distribution name but fail when BOTH are installed
 - conftest.py must not import googletrans at module level; the fixture
   imports it lazily so pytest_configure can raise a friendly UsageError when
   the target is missing.
+- command-line options live in the rootdir conftest.py, not tests/conftest.py:
+  pytest registers options from conftests it discovers while parsing argv, and
+  a value like an existing `--report-file` path makes pytest skip
+  tests/conftest.py entirely, rejecting the options. The rootdir conftest is
+  always read first.
+
+## Test dashboard (GitHub Pages)
+
+https://flynn0.github.io/googletrans-curl-tester/ hosts `dashboard/`, a Vite
+app (vanilla JS, no framework) showing the latest test run: summary cards per
+outcome, a section per test module, and expandable rows with each test's
+source, markers, and failure output.
+
+Data flow: conftest.py writes a JSON report via `--report-file`; the app
+fetches `<base>/results.json` at runtime. The file lives in
+dashboard/public/results.json so Vite copies it into the build.
+
+`.github/workflows/pages.yml` regenerates the report on every push to main
+(and nightly): it runs the full suite with `continue-on-error` - failures are
+the point of a test dashboard, they must not block the deploy - then builds
+and deploys `dashboard/dist` via actions/deploy-pages. Pages is configured
+with build type "workflow" in the repository settings; there is no gh-pages
+branch.
+
+Notes for changes to the dashboard:
+- the app must keep working from the `/googletrans-curl-tester/` base path
+  (vite.config.js `base`, `import.meta.env.BASE_URL` for the fetch URL).
+- do not rename dashboard/ to site/ - .gitignore has `/site` from the Python
+  template.
+- results.json is data, not an artifact: commit the latest snapshot.
 
 ## Known pre-release issues (tracked as xfail(strict=True))
 

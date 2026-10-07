@@ -7,6 +7,10 @@ The fork is planned for publication on PyPI as **googletrans-curl 4.0.3**.
 The import name remains `googletrans`; since 4.0 the API is async
 (`await Translator().translate(...)`).
 
+**Live test report: https://flynn0.github.io/googletrans-curl-tester/** -
+summary cards per outcome plus expandable per-test details (source, markers,
+failure output), regenerated on every push to main and nightly.
+
 ## Quickstart
 
 ```bash
@@ -60,6 +64,21 @@ python -m pytest --expected-version 4.0.3   # release gate
 - push / pull request: offline suite on Ubuntu + Windows, Python 3.9 and 3.13
 - nightly + manual: full online suite (manual runs accept an optional version
   gate input)
+- push to main / nightly: the full suite is rendered into the test dashboard
+  and deployed to GitHub Pages
+
+## Test dashboard
+
+`dashboard/` is a small Vite app (vanilla JS, no framework) that renders a
+pytest run as a web page. Generate its data with:
+
+```bash
+python -m pytest --report-file dashboard/public/results.json
+cd dashboard && npm install && npm run build   # output in dashboard/dist/
+```
+
+The [pages workflow](.github/workflows/pages.yml) does this automatically and
+publishes the result to https://flynn0.github.io/googletrans-curl-tester/.
 
 See [AGENTS.md](AGENTS.md) for the agent-oriented workflow, test conventions
 and the 4.0.3 release checklist.
