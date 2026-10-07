@@ -40,14 +40,14 @@ python -m pytest -m online                  # only network tests
 python -m pytest --expected-version 4.0.3   # release gate
 ```
 
-## Current status against the fork (verified 2026-10-07, main @ db0567f8 = 4.0.2 code base)
+## Current status against the fork (verified 2026-10-08, main @ 90290c8 = 4.0.3)
 
 - installs and imports cleanly; real translations and language detection work
-- two defects are tracked as `xfail(strict=True)` and should be fixed before
-  the 4.0.3 release:
-  - `googletrans.__version__` reports `"3.4.0"` while the metadata says 4.0.2
-  - the `translate` console script crashes with ImportError - the entry point
-    maps to a `googletrans.translate` attribute that does not exist
+- the 4.0.3 code base fixes the stale `googletrans.__version__` (it now
+  matches the metadata); the xfail marker for that check has been removed
+- one defect remains, tracked as `xfail(strict=True)`: the `translate`
+  console script crashes with ImportError - the entry point maps to a
+  `googletrans.translate` attribute that does not exist
 
 ## Installing different sources of the package
 

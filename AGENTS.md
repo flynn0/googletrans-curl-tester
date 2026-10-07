@@ -12,7 +12,7 @@ A release-gate test harness for the **googletrans-curl** PyPI package.
 | PyPI project name | `googletrans-curl` (not published yet; target release **4.0.3**) |
 | Import name | `googletrans` |
 | API style | async since 4.0: `await Translator().translate(...)` |
-| Runtime dependency | `httpx[http2]` as of the 4.0.2 code base |
+| Runtime dependencies | `curl-cffi` and `httpx[http2]` as of the 4.0.3 code base |
 | This repo | pure test harness - never fix package bugs here, fix them in the fork |
 
 Functional tests talk to the real Google Translate endpoint (marker:
@@ -35,7 +35,7 @@ scripts/install_target.py   installs the package under test (git/local/wheel/pyp
 dashboard/                  Vite app that renders a pytest report as a web page
   src/                      main.js + style.css (no framework)
   public/results.json       report data consumed by the app
-.github/workflows/test.yml  CI: offline on push/PR, online nightly + manual
+.github/workflows/test.yml  CI: offline on push/PR (strict), online nightly + manual
 .github/workflows/pages.yml CI: test, build dashboard, deploy to GitHub Pages
 ```
 
@@ -92,8 +92,9 @@ Tests accept either distribution name but fail when BOTH are installed
 - use the `translator` fixture and `helpers.call_with_retry` for online calls.
 - assert stable substrings only (e.g. `"hallo" in result.text.lower()`);
   exact machine-translation output is never stable across time and locale.
-- do not assert on transport internals (httpx specifics) - the 4.0.3 release
-  may switch the HTTP layer (the "curl" in the name).
+- do not assert on transport internals (httpx/curl-cffi specifics) - the HTTP
+  layer already switched once (4.0.3 uses curl-cffi; the "curl" in the name)
+  and may change again.
 - conftest.py must not import googletrans at module level; the fixture
   imports it lazily so pytest_configure can raise a friendly UsageError when
   the target is missing.
@@ -102,6 +103,11 @@ Tests accept either distribution name but fail when BOTH are installed
   a value like an existing `--report-file` path makes pytest skip
   tests/conftest.py entirely, rejecting the options. The rootdir conftest is
   always read first.
+- the `online` job in .github/workflows/test.yml must not go red just because
+  tests fail: pytest exit code 1 (tests failed) is a valid result for a
+  release-gate tester and the step exits 0; only harness errors (pytest
+  crash, usage error, missing target) fail the workflow. The offline job
+  stays strict - offline failures mean the harness itself broke.
 
 ## Test dashboard (GitHub Pages)
 
@@ -128,29 +134,28 @@ Notes for changes to the dashboard:
   template.
 - results.json is data, not an artifact: commit the latest snapshot.
 
-## Known pre-release issues (tracked as xfail(strict=True))
+## Pre-release defects (tracked with xfail(strict=True))
 
-Both exist in the upstream 4.0.2 code base and should be fixed in the fork
-before publishing 4.0.3:
+1. FIXED on the fork's git main (verified 2026-10-08, commit 90290c8): the
+   4.0.3 code base ships `__version__ = "4.0.3"`, matching the metadata. The
+   xfail marker on
+   tests/test_packaging.py::test_module_version_matches_distribution was
+   removed to lock the fix in.
+2. OPEN: the `translate` console script crashes with ImportError - the
+   declared entry point `translate = "googletrans:translate"` targets an
+   attribute the package does not export (tests/test_cli.py, both tests).
 
-1. `googletrans.__version__` is stale (`"3.4.0"`) while the distribution
-   metadata says 4.0.2
-   (tests/test_packaging.py::test_module_version_matches_distribution)
-2. the `translate` console script crashes with ImportError: the declared
-   entry point `translate = "googletrans:translate"` targets an attribute the
-   package does not export (tests/test_cli.py, both tests)
-
-Do not delete or weaken these tests. After the fork is fixed they report
-XPASS(strict) and the suite goes red on purpose: remove the xfail marker at
-that point to lock the fix in.
+Do not delete or weaken the remaining xfail tests. When the fork is fixed
+they report XPASS(strict) and the suite goes red on purpose: remove the
+xfail marker at that point to lock the fix in.
 
 ## Release gate for 4.0.3
 
-1. Fix the two tracked defects in the fork; bump the fork to 4.0.3 (and to
-   the `googletrans-curl` distribution name if that is the publishing plan).
+1. Fix the remaining open defect in the fork (the console script); the
+   stale `__version__` is already fixed and the fork reports 4.0.3.
 2. `python scripts/install_target.py local <checkout>` then
    `python -m pytest --offline` for a fast signal.
-3. Remove the xfail markers (the tests will XPASS after the fixes).
+3. Remove the remaining xfail markers (the test will XPASS after the fix).
 4. `python -m pytest --expected-version 4.0.3` - everything must be green.
 5. Build the wheel, `python scripts/install_target.py wheel <wheel>`, rerun
    the full online suite against the exact artifact.
