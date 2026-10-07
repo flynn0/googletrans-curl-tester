@@ -1,0 +1,52 @@
+name: pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "45 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-test.txt
+      - name: Install package under test (git main)
+        run: python scripts/install_target.py git --allow-system
+      - name: Run full test suite (report for the dashboard)
+        continue-on-error: true
+        run: python -m pytest --report-file dashboard/public/results.json
+      - name: Build dashboard
+        working-directory: dashboard
+        run: |
+          npm ci
+          npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard/dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

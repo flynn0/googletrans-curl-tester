@@ -221,3 +221,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Test dashboard (Vite)
+dashboard/node_modules/
+dashboard/dist/
