@@ -1,0 +1,6 @@
+# Test dependencies for the googletrans-curl tester.
+# The package under test itself is NOT listed here; install it with
+# scripts/install_target.py (see AGENTS.md).
+pytest>=8.0
+pytest-asyncio>=0.24
+packaging>=23.0
