@@ -83,29 +83,38 @@ def target_spec(args):
 
 
 def parse_args(argv):
+    allow_system_help = "allow running against a non-virtualenv interpreter (e.g. in CI)"
+
     parser = argparse.ArgumentParser(
         description="Install the package under test into the current interpreter.",
     )
-    parser.add_argument(
-        "--allow-system",
-        action="store_true",
-        help="allow running against a non-virtualenv interpreter (e.g. in CI)",
-    )
+    parser.add_argument("--allow-system", action="store_true", help=allow_system_help)
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
-    git = subparsers.add_parser("git", help="install from the GitHub fork")
+    # Accept --allow-system after the subcommand too. SUPPRESS keeps the
+    # subparser default from overwriting the top-level flag when it is not
+    # given again after the subcommand.
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument(
+        "--allow-system",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help=allow_system_help,
+    )
+
+    git = subparsers.add_parser("git", parents=[common], help="install from the GitHub fork")
     git.add_argument("--ref", default=None, help="branch, tag or commit (default: default branch)")
 
-    pypi = subparsers.add_parser("pypi", help="install googletrans-curl from PyPI")
+    pypi = subparsers.add_parser("pypi", parents=[common], help="install googletrans-curl from PyPI")
     pypi.add_argument("--version", required=True, help="version to install, e.g. 4.0.3")
 
-    local = subparsers.add_parser("local", help="install from a local checkout")
+    local = subparsers.add_parser("local", parents=[common], help="install from a local checkout")
     local.add_argument("path", help="path to the googletrans-curl checkout")
 
-    wheel = subparsers.add_parser("wheel", help="install a built wheel")
+    wheel = subparsers.add_parser("wheel", parents=[common], help="install a built wheel")
     wheel.add_argument("path", help="path to the .whl file")
 
-    subparsers.add_parser("show", help="report the installed target version")
+    subparsers.add_parser("show", parents=[common], help="report the installed target version")
     return parser.parse_args(argv)
 
 
