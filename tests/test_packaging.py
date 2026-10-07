@@ -35,13 +35,5 @@ def test_module_is_importable():
     assert "Translator" in googletrans.__all__
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "googletrans.__version__ is '3.4.0' in the 4.0.2 code base while the "
-        "distribution metadata says 4.0.2; expected to be fixed in googletrans-curl "
-        "4.0.3 - remove this xfail marker once __version__ matches the metadata."
-    ),
-)
 def test_module_version_matches_distribution(target_distribution):
     assert googletrans.__version__ == target_distribution.version

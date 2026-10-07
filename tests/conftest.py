@@ -116,7 +116,10 @@ async def translator():
 # JSON run report for the dashboard (--report-file)
 # ---------------------------------------------------------------------------
 
-_REPORT = {"started": None, "tests": {}}
+# The start time is captured here, at import: when an existing --report-file
+# value is scanned as an initial path, this conftest is loaded during
+# collection, after pytest_sessionstart has already fired.
+_REPORT = {"started": time.time(), "tests": {}}
 
 
 def _skip_reason(report):
@@ -174,6 +177,13 @@ def _finalize(reports):
         if wasxfail and call["outcome"] == "failed":
             # strict xfail: an unexpected pass fails the run
             return "xpassed", wasxfail, True, call["longrepr"], call["stdout"]
+        if call["outcome"] == "failed" and (call["longrepr"] or "").startswith(
+            "[XPASS(strict)]"
+        ):
+            # pytest reports an unexpected pass under xfail(strict=True) as a
+            # failure with this prefix and without setting wasxfail
+            reason = call["longrepr"].split("]", 1)[1].strip() or None
+            return "xpassed", reason, True, call["longrepr"], call["stdout"]
         if call["outcome"] == "passed":
             return "passed", None, False, None, call["stdout"]
         if call["outcome"] == "failed":
@@ -183,11 +193,6 @@ def _finalize(reports):
     if teardown is not None and teardown["outcome"] == "failed":
         return "errors", None, False, teardown["longrepr"], teardown["stdout"]
     return "unknown", None, False, None, None
-
-
-def pytest_sessionstart(session):
-    if session.config.getoption("--report-file"):
-        _REPORT["started"] = time.time()
 
 
 def pytest_runtest_logreport(report):

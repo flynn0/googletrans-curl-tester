@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-10-07T17:40:33+00:00",
-  "mode": "offline",
+  "generated_at": "2026-10-07T17:59:00+00:00",
+  "mode": "full",
   "expected_version": null,
   "exit_status": 0,
-  "duration": 0.993,
+  "duration": 8.732,
   "summary": {
     "total": 24,
-    "passed": 11,
+    "passed": 21,
     "failed": 0,
-    "skipped": 11,
+    "skipped": 1,
     "xfailed": 2,
     "xpassed": 0,
     "errors": 0
@@ -20,12 +20,12 @@
     "targets": [
       {
         "distribution": "googletrans",
-        "version": "4.0.2"
+        "version": "4.0.3"
       }
     ],
     "git": {
-      "commit": "4c22935",
-      "branch": "qoder"
+      "commit": "ce4fccc",
+      "branch": "main"
     }
   },
   "modules": [
@@ -56,7 +56,7 @@
           ],
           "source": "async def test_translator_supports_async_context_manager():\n    async with Translator() as instance:\n        assert isinstance(instance, Translator)",
           "outcome": "passed",
-          "duration": 0.223
+          "duration": 0.006
         },
         {
           "nodeid": "tests/test_api_offline.py::test_translate_rejects_invalid_destination",
@@ -66,7 +66,7 @@
           ],
           "source": "async def test_translate_rejects_invalid_destination(translator):\n    with pytest.raises(ValueError, match=\"invalid destination language\"):\n        await translator.translate(\"Hello\", dest=\"not-a-language\")",
           "outcome": "passed",
-          "duration": 0.184
+          "duration": 0.003
         },
         {
           "nodeid": "tests/test_api_offline.py::test_translate_rejects_invalid_source",
@@ -76,7 +76,7 @@
           ],
           "source": "async def test_translate_rejects_invalid_source(translator):\n    with pytest.raises(ValueError, match=\"invalid source language\"):\n        await translator.translate(\"Hello\", src=\"not-a-language\")",
           "outcome": "passed",
-          "duration": 0.195
+          "duration": 0.003
         },
         {
           "nodeid": "tests/test_api_offline.py::test_translated_model_contract",
@@ -92,7 +92,7 @@
           "markers": [],
           "source": "def test_detected_model_contract():\n    result = Detected(lang=\"de\", confidence=0.98)\n    assert result.lang == \"de\"\n    assert 0.0 <= result.confidence <= 1.0\n    assert \"de\" in str(result)",
           "outcome": "passed",
-          "duration": 0.0
+          "duration": 0.001
         }
       ]
     },
@@ -115,7 +115,7 @@
           ],
           "source": "@pytest.mark.xfail(strict=True, reason=CLI_XFAIL_REASON)\ndef test_translate_cli_help():\n    script = find_console_script(\"translate\")\n    assert script is not None, \"console script 'translate' is not installed\"\n    proc = run_console_script(script, [\"--help\"])\n    assert proc.returncode == 0, proc.stderr\n    assert \"usage\" in proc.stdout.lower()",
           "outcome": "xfailed",
-          "duration": 0.268,
+          "duration": 0.365,
           "reason": "the console script 'translate = googletrans:translate' is broken in the 4.0.2 code base (ImportError: cannot import name 'translate' - the googletrans package exports no such attribute). Expected to be fixed in googletrans-curl 4.0.3; remove this xfail marker once the script works."
         },
         {
@@ -123,13 +123,12 @@
           "name": "test_translate_cli_translates",
           "markers": [
             "online",
-            "skip",
             "xfail"
           ],
           "source": "@pytest.mark.online\n@pytest.mark.xfail(strict=True, reason=CLI_XFAIL_REASON)\ndef test_translate_cli_translates():\n    script = find_console_script(\"translate\")\n    assert script is not None, \"console script 'translate' is not installed\"\n    proc = run_console_script(script, [\"Hello world\", \"-d\", \"de\"])\n    assert proc.returncode == 0, proc.stderr\n    assert \"hallo\" in proc.stdout.lower()",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "xfailed",
+          "duration": 0.416,
+          "reason": "the console script 'translate = googletrans:translate' is broken in the 4.0.2 code base (ImportError: cannot import name 'translate' - the googletrans package exports no such attribute). Expected to be fixed in googletrans-curl 4.0.3; remove this xfail marker once the script works."
         }
       ]
     },
@@ -141,39 +140,33 @@
           "name": "test_detect_french",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_detect_french(translator):\n    result = await call_with_retry(lambda: translator.detect(\"Bonjour tout le monde\"))\n    assert result.lang == \"fr\"\n    assert 0.0 <= result.confidence <= 1.0",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 0.447
         },
         {
           "nodeid": "tests/test_detect_online.py::test_detect_japanese",
           "name": "test_detect_japanese",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_detect_japanese(translator):\n    result = await call_with_retry(lambda: translator.detect(\"こんにちは世界\"))\n    assert result.lang == \"ja\"",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 0.974
         },
         {
           "nodeid": "tests/test_detect_online.py::test_detect_batch",
           "name": "test_detect_batch",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_detect_batch(translator):\n    texts = [\"Bonjour tout le monde\", \"こんにちは世界\"]\n    results = await call_with_retry(lambda: translator.detect(texts))\n    assert [item.lang for item in results] == [\"fr\", \"ja\"]",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 0.368
         }
       ]
     },
@@ -186,7 +179,7 @@
           "markers": [],
           "source": "def test_exactly_one_target_distribution_installed(target_distributions):\n    assert len(target_distributions) == 1, (\n        \"both 'googletrans' and 'googletrans-curl' are installed; tests would be \"\n        \"ambiguous about which module gets imported (a stale copy of the other \"\n        \"name shadows the real target).\"\n    )",
           "outcome": "passed",
-          "duration": 0.001
+          "duration": 0.0
         },
         {
           "nodeid": "tests/test_packaging.py::test_distribution_version_within_supported_range",
@@ -216,13 +209,10 @@
         {
           "nodeid": "tests/test_packaging.py::test_module_version_matches_distribution",
           "name": "test_module_version_matches_distribution",
-          "markers": [
-            "xfail"
-          ],
-          "source": "@pytest.mark.xfail(\n    strict=True,\n    reason=(\n        \"googletrans.__version__ is '3.4.0' in the 4.0.2 code base while the \"\n        \"distribution metadata says 4.0.2; expected to be fixed in googletrans-curl \"\n        \"4.0.3 - remove this xfail marker once __version__ matches the metadata.\"\n    ),\n)\ndef test_module_version_matches_distribution(target_distribution):\n    assert googletrans.__version__ == target_distribution.version",
-          "outcome": "xfailed",
-          "duration": 0.001,
-          "reason": "googletrans.__version__ is '3.4.0' in the 4.0.2 code base while the distribution metadata says 4.0.2; expected to be fixed in googletrans-curl 4.0.3 - remove this xfail marker once __version__ matches the metadata."
+          "markers": [],
+          "source": "def test_module_version_matches_distribution(target_distribution):\n    assert googletrans.__version__ == target_distribution.version",
+          "outcome": "passed",
+          "duration": 0.001
         }
       ]
     },
@@ -234,78 +224,66 @@
           "name": "test_translate_english_to_german",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_translate_english_to_german(translator):\n    result = await call_with_retry(lambda: translator.translate(\"Hello, world!\", dest=\"de\"))\n    assert result.src == \"en\"\n    assert result.dest == \"de\"\n    assert result.origin == \"Hello, world!\"\n    assert \"hallo\" in result.text.lower()\n    assert result._response.status_code == 200",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 1.045
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_with_explicit_source",
           "name": "test_translate_with_explicit_source",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_translate_with_explicit_source(translator):\n    result = await call_with_retry(\n        lambda: translator.translate(\"Guten Morgen\", src=\"de\", dest=\"en\")\n    )\n    assert result.src == \"de\"\n    assert result.dest == \"en\"\n    assert \"morning\" in result.text.lower()",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 0.814
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_destination_by_language_name",
           "name": "test_translate_destination_by_language_name",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_translate_destination_by_language_name(translator):\n    result = await call_with_retry(\n        lambda: translator.translate(\"Good morning\", dest=\"german\")\n    )\n    assert result.dest == \"de\"\n    assert \"morgen\" in result.text.lower()",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 1.281
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_batch_preserves_order",
           "name": "test_translate_batch_preserves_order",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_translate_batch_preserves_order(translator):\n    texts = [\"Hello\", \"Thank you\", \"Goodbye\"]\n    results = await call_with_retry(lambda: translator.translate(texts, dest=\"de\"))\n    assert isinstance(results, list)\n    assert [item.origin for item in results] == texts\n    assert \"danke\" in results[1].text.lower()\n    assert all(item.text for item in results)",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 0.976
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_non_latin_text",
           "name": "test_translate_non_latin_text",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_translate_non_latin_text(translator):\n    result = await call_with_retry(lambda: translator.translate(\"你好，世界\", dest=\"en\"))\n    assert result.src.lower() in {\"zh-cn\", \"zh\"}\n    assert \"hello\" in result.text.lower()",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 0.862
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_round_trip",
           "name": "test_translate_round_trip",
           "markers": [
             "asyncio",
-            "online",
-            "skip"
+            "online"
           ],
           "source": "async def test_translate_round_trip(translator):\n    german = await call_with_retry(\n        lambda: translator.translate(\"The weather is nice today.\", dest=\"de\")\n    )\n    back = await call_with_retry(\n        lambda: translator.translate(german.text, src=\"de\", dest=\"en\")\n    )\n    assert \"weather\" in back.text.lower()\n    assert \"today\" in back.text.lower()",
-          "outcome": "skipped",
-          "duration": 0.0,
-          "reason": "Skipped: --offline: test needs network access"
+          "outcome": "passed",
+          "duration": 1.001
         }
       ]
     }
