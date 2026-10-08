@@ -9,7 +9,7 @@ A release-gate test harness for the **googletrans-curl** PyPI package.
 | Fact | Value |
 | --- | --- |
 | Package under test | https://github.com/kreier/googletrans-curl (fork of https://github.com/ssut/py-googletrans) |
-| PyPI project name | `googletrans-curl` (not published yet; target release **4.0.3**) |
+| PyPI project name | `googletrans-curl` - published, latest release **4.0.3** (https://pypi.org/project/googletrans-curl/) |
 | Import name | `googletrans` |
 | API style | async since 4.0: `await Translator().translate(...)` |
 | Runtime dependencies | `curl-cffi` and `httpx[http2]` as of the 4.0.3 code base |
@@ -25,7 +25,7 @@ are covered offline.
 conftest.py                 pytest options only (rootdir: always parsed first)
 tests/
   conftest.py               fixtures + JSON report hooks (--report-file)
-  helpers.py                retry helper, console-script helpers, xfail reasons
+  helpers.py                retry helper, console-script helpers
   test_packaging.py         installed distribution metadata / version gate
   test_api_offline.py       imports, constants, models, invalid-input errors
   test_translate_online.py  real translations (network)
@@ -35,8 +35,8 @@ scripts/install_target.py   installs the package under test (git/local/wheel/pyp
 dashboard/                  Vite app that renders a pytest report as a web page
   src/                      main.js + style.css (no framework)
   public/results.json       report data consumed by the app
-.github/workflows/test.yml  CI: offline on push/PR (strict), online nightly + manual
-.github/workflows/pages.yml CI: test, build dashboard, deploy to GitHub Pages
+.github/workflows/test.yml  CI: offline on push/PR (git main, strict), online nightly + manual (PyPI release)
+.github/workflows/pages.yml CI: test (PyPI release), build dashboard, deploy to GitHub Pages
 ```
 
 ## Environment setup (fresh clone)
@@ -45,11 +45,14 @@ dashboard/                  Vite app that renders a pytest report as a web page
 python -m venv .venv
 # Windows:
 .venv/Scripts/python -m pip install -r requirements-test.txt
-.venv/Scripts/python scripts/install_target.py git
+.venv/Scripts/python scripts/install_target.py pypi --version 4.0.3
 # POSIX:
 .venv/bin/python -m pip install -r requirements-test.txt
-.venv/bin/python scripts/install_target.py git
+.venv/bin/python scripts/install_target.py pypi --version 4.0.3
 ```
+
+That installs the published release - the artifact users get. Use
+`install_target.py git` instead when the goal is the fork's development code.
 
 Run pytest with the venv interpreter (`.venv/Scripts/python -m pytest` on
 Windows, `.venv/bin/python -m pytest` on POSIX) from the repository root.
@@ -134,30 +137,36 @@ Notes for changes to the dashboard:
   template.
 - results.json is data, not an artifact: commit the latest snapshot.
 
-## Pre-release defects (tracked with xfail(strict=True))
+## Defects tracked with xfail(strict=True)
 
-1. FIXED on the fork's git main (verified 2026-10-08, commit 90290c8): the
-   4.0.3 code base ships `__version__ = "4.0.3"`, matching the metadata. The
-   xfail marker on
+Both pre-release defects are FIXED and verified against the published PyPI
+package (2026-10-08, `googletrans-curl 4.0.3`, full suite 24 passed):
+
+1. the 4.0.3 code base ships `__version__ = "4.0.3"`, matching the metadata
+   (fork commit 90290c8) - the xfail marker on
    tests/test_packaging.py::test_module_version_matches_distribution was
    removed to lock the fix in.
-2. OPEN: the `translate` console script crashes with ImportError - the
-   declared entry point `translate = "googletrans:translate"` targets an
-   attribute the package does not export (tests/test_cli.py, both tests).
+2. the `translate` console script works (`--help` and a real translation) -
+   the xfail markers on both tests/test_cli.py runtime checks were removed.
 
-Do not delete or weaken the remaining xfail tests. When the fork is fixed
-they report XPASS(strict) and the suite goes red on purpose: remove the
-xfail marker at that point to lock the fix in.
+The suite currently has no xfail tests. If a new defect is found in the fork,
+track it the same way: `xfail(strict=True)` with a reason naming the defect
+and the release expected to fix it, never a weakened assertion. When the fork
+is fixed such a test reports XPASS(strict) and the suite goes red on purpose -
+remove the marker at that point to lock the fix in.
 
-## Release gate for 4.0.3
+## Release gate
 
-1. Fix the remaining open defect in the fork (the console script); the
-   stale `__version__` is already fixed and the fork reports 4.0.3.
+4.0.3 passed the gate on 2026-10-08 (published at
+https://pypi.org/project/googletrans-curl/4.0.3/). Repeat these steps for the
+next release, substituting the new version:
+
+1. Fix open defects in the fork, not here.
 2. `python scripts/install_target.py local <checkout>` then
    `python -m pytest --offline` for a fast signal.
-3. Remove the remaining xfail markers (the test will XPASS after the fix).
-4. `python -m pytest --expected-version 4.0.3` - everything must be green.
+3. Remove xfail markers for the defects that were fixed (they XPASS now).
+4. `python -m pytest --expected-version <version>` - everything must be green.
 5. Build the wheel, `python scripts/install_target.py wheel <wheel>`, rerun
    the full online suite against the exact artifact.
-6. Publish, then `python scripts/install_target.py pypi --version 4.0.3` and
-   run the full suite once more against the published package.
+6. Publish, then `python scripts/install_target.py pypi --version <version>`
+   and run the full suite once more against the published package.

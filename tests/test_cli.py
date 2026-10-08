@@ -1,14 +1,8 @@
-"""The 'translate' console script declared in the package's pyproject.toml.
-
-Both runtime checks are xfail(strict=True): they document a known defect of
-the 4.0.2 code base that should be fixed in the fork before the 4.0.3
-release. When they start reporting XPASS, delete the markers - do not weaken
-the assertions.
-"""
+"""The 'translate' console script declared in the package's pyproject.toml."""
 
 import pytest
 
-from helpers import CLI_XFAIL_REASON, find_console_script, run_console_script
+from helpers import find_console_script, run_console_script
 
 
 def test_entry_point_is_declared(target_distribution):
@@ -20,7 +14,6 @@ def test_entry_point_is_declared(target_distribution):
     assert "translate" in names
 
 
-@pytest.mark.xfail(strict=True, reason=CLI_XFAIL_REASON)
 def test_translate_cli_help():
     script = find_console_script("translate")
     assert script is not None, "console script 'translate' is not installed"
@@ -30,7 +23,6 @@ def test_translate_cli_help():
 
 
 @pytest.mark.online
-@pytest.mark.xfail(strict=True, reason=CLI_XFAIL_REASON)
 def test_translate_cli_translates():
     script = find_console_script("translate")
     assert script is not None, "console script 'translate' is not installed"

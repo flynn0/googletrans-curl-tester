@@ -3,8 +3,8 @@
 Release-gate test harness for the [googletrans-curl](https://github.com/kreier/googletrans-curl)
 PyPI package - a fork of [py-googletrans](https://github.com/ssut/py-googletrans).
 
-The fork is planned for publication on PyPI as **googletrans-curl 4.0.3**.
-The import name remains `googletrans`; since 4.0 the API is async
+The fork is published on PyPI as [googletrans-curl](https://pypi.org/project/googletrans-curl/)
+**4.0.3**. The import name remains `googletrans`; since 4.0 the API is async
 (`await Translator().translate(...)`).
 
 **Live test report: https://flynn0.github.io/googletrans-curl-tester/** -
@@ -17,7 +17,7 @@ failure output), regenerated on every push to main and nightly.
 python -m venv .venv
 # Windows
 .venv/Scripts/python -m pip install -r requirements-test.txt
-.venv/Scripts/python scripts/install_target.py git
+.venv/Scripts/python scripts/install_target.py pypi --version 4.0.3
 .venv/Scripts/python -m pytest
 # POSIX: replace .venv/Scripts with .venv/bin
 ```
@@ -40,14 +40,13 @@ python -m pytest -m online                  # only network tests
 python -m pytest --expected-version 4.0.3   # release gate
 ```
 
-## Current status against the fork (verified 2026-10-08, main @ 90290c8 = 4.0.3)
+## Current status (verified 2026-10-08 against the published PyPI package)
 
-- installs and imports cleanly; real translations and language detection work
-- the 4.0.3 code base fixes the stale `googletrans.__version__` (it now
-  matches the metadata); the xfail marker for that check has been removed
-- one defect remains, tracked as `xfail(strict=True)`: the `translate`
-  console script crashes with ImportError - the entry point maps to a
-  `googletrans.translate` attribute that does not exist
+- `googletrans-curl 4.0.3` installs and imports cleanly; real translations and
+  language detection work - the full suite is **24 passed**
+- both pre-release defects are fixed, so their `xfail(strict=True)` markers are
+  gone: `googletrans.__version__` now matches the distribution metadata, and
+  the `translate` console script runs (`--help` and a real translation)
 
 ## Installing different sources of the package
 
@@ -61,11 +60,12 @@ python -m pytest --expected-version 4.0.3   # release gate
 
 ## CI
 
-- push / pull request: offline suite on Ubuntu + Windows, Python 3.9 and 3.13
-- nightly + manual: full online suite (manual runs accept an optional version
-  gate input)
-- push to main / nightly: the full suite is rendered into the test dashboard
-  and deployed to GitHub Pages
+- push / pull request: offline suite on Ubuntu + Windows, Python 3.9 and 3.13,
+  against the fork's git main
+- nightly + manual: full online suite against the published PyPI release
+  (manual runs accept an optional version gate input)
+- push to main / nightly: the full suite runs against the published PyPI
+  release, is rendered into the test dashboard and deployed to GitHub Pages
 
 ## Test dashboard
 

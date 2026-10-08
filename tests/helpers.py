@@ -12,13 +12,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-CLI_XFAIL_REASON = (
-    "the console script 'translate = googletrans:translate' is broken in the 4.0.2 "
-    "code base (ImportError: cannot import name 'translate' - the googletrans "
-    "package exports no such attribute). Expected to be fixed in googletrans-curl "
-    "4.0.3; remove this xfail marker once the script works."
-)
-
 
 async def call_with_retry(operation, attempts=3, delay=2.0):
     """Await operation() and retry transient network errors a few times."""
