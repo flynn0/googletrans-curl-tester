@@ -16,6 +16,10 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  # The dashboard reports on the published release people install.
+  RELEASED_VERSION: "4.0.3"
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -34,8 +38,8 @@ jobs:
           cache-dependency-path: dashboard/package-lock.json
       - name: Install test dependencies
         run: python -m pip install -r requirements-test.txt
-      - name: Install package under test (git main)
-        run: python scripts/install_target.py git --allow-system
+      - name: Install package under test (PyPI release)
+        run: python scripts/install_target.py pypi --version ${{ env.RELEASED_VERSION }} --allow-system
       - name: Run full test suite (report for the dashboard)
         continue-on-error: true
         run: python -m pytest --report-file dashboard/public/results.json
