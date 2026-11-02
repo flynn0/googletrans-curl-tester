@@ -32,9 +32,12 @@ tests/
   test_detect_online.py     real language detection (network)
   test_cli.py               'translate' console script
 scripts/install_target.py   installs the package under test (git/local/wheel/pypi)
-dashboard/                  Vite app that renders a pytest report as a web page
+scripts/update_history.py   tracks historical and future runs in history.json
+history.json                root database of test runs since repo creation
+dashboard/                  Vite app (v0.2.0) that renders report, heatmap, and tickbar
   src/                      main.js + style.css (no framework)
-  public/results.json       report data consumed by the app
+  public/results.json       latest report data consumed by the app
+  public/history.json       run history database consumed by the heatmap & tickbar
 .github/workflows/test.yml  CI: offline on push/PR (git main, strict), online nightly + manual (PyPI release)
 .github/workflows/pages.yml CI: test (PyPI release), build dashboard, deploy to GitHub Pages
 ```
@@ -68,6 +71,8 @@ installed.
 | Network only | `python -m pytest -m online` |
 | Release gate | `python -m pytest --expected-version 4.1.0` |
 | Write dashboard data | `python -m pytest --report-file dashboard/public/results.json` |
+| Sync run history database | `python scripts/update_history.py` |
+| Show history statistics | `python scripts/update_history.py --show` |
 | Dashboard dev server | `cd dashboard && npm install && npm run dev` |
 | Test the built dashboard | `cd dashboard && npm run build && npm run preview` |
 | Show installed target | `python scripts/install_target.py show` |

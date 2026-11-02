@@ -273,3 +273,23 @@ def pytest_sessionfinish(session, exitstatus):
     path = Path(report_file)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    history_file = session.config.getoption("--history-file")
+    target_history = Path(history_file) if history_file else Path("dashboard/public/history.json")
+    if target_history.exists() or history_file:
+        try:
+            root_path = Path(session.config.rootpath)
+            sys_path_str = str(root_path)
+            if sys_path_str not in sys.path:
+                sys.path.insert(0, sys_path_str)
+            from scripts.update_history import add_pytest_report, load_history, save_history
+
+            h_data = load_history(target_history)
+            if add_pytest_report(h_data, path):
+                save_targets = [target_history]
+                root_copy = root_path / "history.json"
+                if root_copy.resolve() != target_history.resolve() and root_copy.exists():
+                    save_targets.append(root_copy)
+                save_history(h_data, save_targets)
+        except Exception:
+            pass

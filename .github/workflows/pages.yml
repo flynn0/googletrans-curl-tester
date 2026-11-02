@@ -43,6 +43,9 @@ jobs:
       - name: Run full test suite (report for the dashboard)
         continue-on-error: true
         run: python -m pytest --report-file dashboard/public/results.json
+      - name: Update test run history
+        if: always()
+        run: python scripts/update_history.py --from-report dashboard/public/results.json --history-file dashboard/public/history.json
       - name: Build dashboard
         working-directory: dashboard
         run: |

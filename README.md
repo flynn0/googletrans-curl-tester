@@ -80,13 +80,18 @@ python -m pytest --expected-version 4.1.0   # release gate
 
 ## Test dashboard
 
-`dashboard/` is a small Vite app (vanilla JS, no framework) that renders a
-pytest run as a web page with dynamic dark and light mode theme support (featuring
-a one-click header toggle, `localStorage` persistence, and OS color scheme detection).
+`dashboard/` is a Vite app (vanilla JS, no framework, release **v0.2.0**) that renders
+test runs and continuous health indicators as a web page:
+- **Theme support**: dynamic dark and light mode with a one-click header toggle, `localStorage` persistence, and OS color scheme detection.
+- **Test run history database**: tracks recent and future test executions across GitHub Actions workflows and local pytest runs in `history.json`.
+- **Reliability indicator**: interactive 30-tickbar indicator for the last 30 runs or last 30 days with live status tooltips and overall pass rate metrics.
+- **Success heatmap**: calendar matrix tracking daily successful and failed runs since repository launch on October 7, 2026, with an interactive click-to-view drawer for individual workflow executions.
+
 Generate its data with:
 
 ```bash
 python -m pytest --report-file dashboard/public/results.json
+python scripts/update_history.py --from-report dashboard/public/results.json
 cd dashboard && npm install && npm run build   # output in dashboard/dist/
 ```
 

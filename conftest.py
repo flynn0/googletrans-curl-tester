@@ -34,3 +34,10 @@ def pytest_addoption(parser):
         metavar="PATH",
         help="write a JSON report of the run (feeds the dashboard) to PATH",
     )
+    parser.addoption(
+        "--history-file",
+        action="store",
+        default=None,
+        metavar="PATH",
+        help="append run to the history database (feeds the heatmap and tickbar)",
+    )
