@@ -6,7 +6,7 @@ over time and must never be pinned. Deselect with --offline or -m "not online".
 
 import pytest
 
-from helpers import call_with_retry
+from helpers import call_sync_with_retry, call_with_retry
 
 pytestmark = pytest.mark.online
 
@@ -20,9 +20,28 @@ async def test_translate_english_to_german(translator):
     assert result._response.status_code == 200
 
 
+def test_sync_translate_english_to_german(sync_translator):
+    result = call_sync_with_retry(
+        lambda: sync_translator.translate("Hello, world!", dest="de")
+    )
+    assert result.src == "en"
+    assert result.dest == "de"
+    assert result.origin == "Hello, world!"
+    assert "hallo" in result.text.lower()
+
+
 async def test_translate_with_explicit_source(translator):
     result = await call_with_retry(
         lambda: translator.translate("Guten Morgen", src="de", dest="en")
+    )
+    assert result.src == "de"
+    assert result.dest == "en"
+    assert "morning" in result.text.lower()
+
+
+def test_sync_translate_with_explicit_source(sync_translator):
+    result = call_sync_with_retry(
+        lambda: sync_translator.translate("Guten Morgen", src="de", dest="en")
     )
     assert result.src == "de"
     assert result.dest == "en"
@@ -44,6 +63,32 @@ async def test_translate_batch_preserves_order(translator):
     assert [item.origin for item in results] == texts
     assert "danke" in results[1].text.lower()
     assert all(item.text for item in results)
+
+
+def test_sync_translate_batch_preserves_order(sync_translator):
+    texts = ["Hello", "Thank you", "Goodbye"]
+    results = call_sync_with_retry(lambda: sync_translator.translate(texts, dest="de"))
+    assert isinstance(results, list)
+    assert [item.origin for item in results] == texts
+    assert "danke" in results[1].text.lower()
+    assert all(item.text for item in results)
+
+
+def test_translator_translate_sync_method():
+    from googletrans import Translator
+
+    translator = Translator()
+    result = call_sync_with_retry(lambda: translator.translate_sync("Hello", dest="de"))
+    assert result.dest == "de"
+    assert "hallo" in result.text.lower()
+
+
+async def test_translate_explicit_curl_transport():
+    from googletrans import Translator
+
+    async with Translator(transport="curl") as t:
+        result = await call_with_retry(lambda: t.translate("Hello", dest="de"))
+        assert "hallo" in result.text.lower()
 
 
 async def test_translate_non_latin_text(translator):

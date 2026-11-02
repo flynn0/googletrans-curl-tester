@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-08T00:28:46+00:00",
+  "generated_at": "2026-11-02T07:37:00+00:00",
   "mode": "full",
-  "expected_version": "4.0.3",
+  "expected_version": "4.1.0",
   "exit_status": 0,
-  "duration": 7.29,
+  "duration": 8.381,
   "summary": {
-    "total": 24,
-    "passed": 24,
+    "total": 40,
+    "passed": 40,
     "failed": 0,
     "skipped": 0,
     "xfailed": 0,
@@ -14,18 +14,18 @@
     "errors": 0
   },
   "environment": {
-    "python": "3.13.3",
-    "platform": "Windows 11",
-    "pytest": "9.1.1",
+    "python": "3.14.4",
+    "platform": "Linux 6.18.54.1-microsoft-standard-WSL2",
+    "pytest": "9.2.0",
     "targets": [
       {
         "distribution": "googletrans-curl",
-        "version": "4.0.3"
+        "version": "4.1.0"
       }
     ],
     "git": {
-      "commit": "4253e0c",
-      "branch": "lock-in-version-fix-online-ci"
+      "commit": "b607e08",
+      "branch": "main"
     }
   },
   "modules": [
@@ -38,7 +38,7 @@
           "markers": [],
           "source": "def test_submodules_are_importable():\n    from googletrans import client, constants, gtoken, models, urls, utils  # noqa: F401",
           "outcome": "passed",
-          "duration": 0.001
+          "duration": 0.0
         },
         {
           "nodeid": "tests/test_api_offline.py::test_language_tables_are_populated",
@@ -56,7 +56,15 @@
           ],
           "source": "async def test_translator_supports_async_context_manager():\n    async with Translator() as instance:\n        assert isinstance(instance, Translator)",
           "outcome": "passed",
-          "duration": 0.005
+          "duration": 0.001
+        },
+        {
+          "nodeid": "tests/test_api_offline.py::test_sync_translator_supports_context_manager",
+          "name": "test_sync_translator_supports_context_manager",
+          "markers": [],
+          "source": "def test_sync_translator_supports_context_manager():\n    with SyncTranslator() as instance:\n        assert isinstance(instance, SyncTranslator)",
+          "outcome": "passed",
+          "duration": 0.001
         },
         {
           "nodeid": "tests/test_api_offline.py::test_translate_rejects_invalid_destination",
@@ -66,7 +74,7 @@
           ],
           "source": "async def test_translate_rejects_invalid_destination(translator):\n    with pytest.raises(ValueError, match=\"invalid destination language\"):\n        await translator.translate(\"Hello\", dest=\"not-a-language\")",
           "outcome": "passed",
-          "duration": 0.003
+          "duration": 0.001
         },
         {
           "nodeid": "tests/test_api_offline.py::test_translate_rejects_invalid_source",
@@ -76,7 +84,55 @@
           ],
           "source": "async def test_translate_rejects_invalid_source(translator):\n    with pytest.raises(ValueError, match=\"invalid source language\"):\n        await translator.translate(\"Hello\", src=\"not-a-language\")",
           "outcome": "passed",
-          "duration": 0.003
+          "duration": 0.001
+        },
+        {
+          "nodeid": "tests/test_api_offline.py::test_sync_translate_rejects_invalid_destination",
+          "name": "test_sync_translate_rejects_invalid_destination",
+          "markers": [],
+          "source": "def test_sync_translate_rejects_invalid_destination(sync_translator):\n    with pytest.raises(ValueError, match=\"invalid destination language\"):\n        sync_translator.translate(\"Hello\", dest=\"not-a-language\")",
+          "outcome": "passed",
+          "duration": 0.001
+        },
+        {
+          "nodeid": "tests/test_api_offline.py::test_sync_translate_rejects_invalid_source",
+          "name": "test_sync_translate_rejects_invalid_source",
+          "markers": [],
+          "source": "def test_sync_translate_rejects_invalid_source(sync_translator):\n    with pytest.raises(ValueError, match=\"invalid source language\"):\n        sync_translator.translate(\"Hello\", src=\"not-a-language\")",
+          "outcome": "passed",
+          "duration": 0.001
+        },
+        {
+          "nodeid": "tests/test_api_offline.py::test_translator_rejects_invalid_transport",
+          "name": "test_translator_rejects_invalid_transport",
+          "markers": [],
+          "source": "def test_translator_rejects_invalid_transport():\n    with pytest.raises(ValueError, match=\"Invalid transport\"):\n        Translator(transport=\"invalid_transport\")",
+          "outcome": "passed",
+          "duration": 0.0
+        },
+        {
+          "nodeid": "tests/test_api_offline.py::test_sync_translator_rejects_invalid_transport",
+          "name": "test_sync_translator_rejects_invalid_transport",
+          "markers": [],
+          "source": "def test_sync_translator_rejects_invalid_transport():\n    with pytest.raises(ValueError, match=\"Invalid transport\"):\n        SyncTranslator(transport=\"invalid_transport\")",
+          "outcome": "passed",
+          "duration": 0.0
+        },
+        {
+          "nodeid": "tests/test_api_offline.py::test_language_normalization",
+          "name": "test_language_normalization",
+          "markers": [],
+          "source": "def test_language_normalization():\n    assert _normalize_lang(\"en_US\") == \"en\"\n    assert _normalize_lang(\"zh_CN\") == \"zh-cn\"\n    assert _normalize_lang(\"DE\") == \"de\"",
+          "outcome": "passed",
+          "duration": 0.0
+        },
+        {
+          "nodeid": "tests/test_api_offline.py::test_exception_hierarchy",
+          "name": "test_exception_hierarchy",
+          "markers": [],
+          "source": "def test_exception_hierarchy():\n    assert issubclass(RateLimitError, TranslationError)\n    err = TranslationError(\"network error\", status_code=500)\n    assert err.status_code == 500\n    assert \"network error\" in str(err)",
+          "outcome": "passed",
+          "duration": 0.0
         },
         {
           "nodeid": "tests/test_api_offline.py::test_translated_model_contract",
@@ -105,7 +161,7 @@
           "markers": [],
           "source": "def test_entry_point_is_declared(target_distribution):\n    names = [\n        entry_point.name\n        for entry_point in target_distribution.entry_points\n        if entry_point.group == \"console_scripts\"\n    ]\n    assert \"translate\" in names",
           "outcome": "passed",
-          "duration": 0.001
+          "duration": 0.0
         },
         {
           "nodeid": "tests/test_cli.py::test_translate_cli_help",
@@ -113,7 +169,7 @@
           "markers": [],
           "source": "def test_translate_cli_help():\n    script = find_console_script(\"translate\")\n    assert script is not None, \"console script 'translate' is not installed\"\n    proc = run_console_script(script, [\"--help\"])\n    assert proc.returncode == 0, proc.stderr\n    assert \"usage\" in proc.stdout.lower()",
           "outcome": "passed",
-          "duration": 0.345
+          "duration": 0.1
         },
         {
           "nodeid": "tests/test_cli.py::test_translate_cli_translates",
@@ -123,7 +179,17 @@
           ],
           "source": "@pytest.mark.online\ndef test_translate_cli_translates():\n    script = find_console_script(\"translate\")\n    assert script is not None, \"console script 'translate' is not installed\"\n    proc = run_console_script(script, [\"Hello world\", \"-d\", \"de\"])\n    assert proc.returncode == 0, proc.stderr\n    assert \"hallo\" in proc.stdout.lower()",
           "outcome": "passed",
-          "duration": 1.076
+          "duration": 0.5
+        },
+        {
+          "nodeid": "tests/test_cli.py::test_translate_cli_detects_language",
+          "name": "test_translate_cli_detects_language",
+          "markers": [
+            "online"
+          ],
+          "source": "@pytest.mark.online\ndef test_translate_cli_detects_language():\n    script = find_console_script(\"translate\")\n    assert script is not None, \"console script 'translate' is not installed\"\n    proc = run_console_script(script, [\"Bonjour tout le monde\", \"-c\"])\n    assert proc.returncode == 0, proc.stderr\n    assert \"fr\" in proc.stdout.lower()",
+          "outcome": "passed",
+          "duration": 1.098
         }
       ]
     },
@@ -139,7 +205,17 @@
           ],
           "source": "async def test_detect_french(translator):\n    result = await call_with_retry(lambda: translator.detect(\"Bonjour tout le monde\"))\n    assert result.lang == \"fr\"\n    assert 0.0 <= result.confidence <= 1.0",
           "outcome": "passed",
-          "duration": 0.463
+          "duration": 0.225
+        },
+        {
+          "nodeid": "tests/test_detect_online.py::test_sync_detect_french",
+          "name": "test_sync_detect_french",
+          "markers": [
+            "online"
+          ],
+          "source": "def test_sync_detect_french(sync_translator):\n    result = call_sync_with_retry(\n        lambda: sync_translator.detect(\"Bonjour tout le monde\")\n    )\n    assert result.lang == \"fr\"\n    assert 0.0 <= result.confidence <= 1.0",
+          "outcome": "passed",
+          "duration": 0.178
         },
         {
           "nodeid": "tests/test_detect_online.py::test_detect_japanese",
@@ -150,7 +226,7 @@
           ],
           "source": "async def test_detect_japanese(translator):\n    result = await call_with_retry(lambda: translator.detect(\"こんにちは世界\"))\n    assert result.lang == \"ja\"",
           "outcome": "passed",
-          "duration": 0.288
+          "duration": 0.199
         },
         {
           "nodeid": "tests/test_detect_online.py::test_detect_batch",
@@ -161,7 +237,27 @@
           ],
           "source": "async def test_detect_batch(translator):\n    texts = [\"Bonjour tout le monde\", \"こんにちは世界\"]\n    results = await call_with_retry(lambda: translator.detect(texts))\n    assert [item.lang for item in results] == [\"fr\", \"ja\"]",
           "outcome": "passed",
-          "duration": 0.474
+          "duration": 0.182
+        },
+        {
+          "nodeid": "tests/test_detect_online.py::test_sync_detect_batch",
+          "name": "test_sync_detect_batch",
+          "markers": [
+            "online"
+          ],
+          "source": "def test_sync_detect_batch(sync_translator):\n    texts = [\"Bonjour tout le monde\", \"こんにちは世界\"]\n    results = call_sync_with_retry(lambda: sync_translator.detect(texts))\n    assert [item.lang for item in results] == [\"fr\", \"ja\"]",
+          "outcome": "passed",
+          "duration": 0.55
+        },
+        {
+          "nodeid": "tests/test_detect_online.py::test_translator_detect_sync_method",
+          "name": "test_translator_detect_sync_method",
+          "markers": [
+            "online"
+          ],
+          "source": "def test_translator_detect_sync_method():\n    from googletrans import Translator\n\n    translator = Translator()\n    result = call_sync_with_retry(\n        lambda: translator.detect_sync(\"Bonjour tout le monde\")\n    )\n    assert result.lang == \"fr\"",
+          "outcome": "passed",
+          "duration": 0.185
         }
       ]
     },
@@ -174,7 +270,7 @@
           "markers": [],
           "source": "def test_exactly_one_target_distribution_installed(target_distributions):\n    assert len(target_distributions) == 1, (\n        \"both 'googletrans' and 'googletrans-curl' are installed; tests would be \"\n        \"ambiguous about which module gets imported (a stale copy of the other \"\n        \"name shadows the real target).\"\n    )",
           "outcome": "passed",
-          "duration": 0.001
+          "duration": 0.0
         },
         {
           "nodeid": "tests/test_packaging.py::test_distribution_version_within_supported_range",
@@ -182,7 +278,7 @@
           "markers": [],
           "source": "def test_distribution_version_within_supported_range(target_version):\n    assert target_version >= MINIMUM_SUPPORTED, (\n        f\"installed target version {target_version} is older than \"\n        f\"{MINIMUM_SUPPORTED}; the test suite does not describe it\"\n    )",
           "outcome": "passed",
-          "duration": 0.001
+          "duration": 0.0
         },
         {
           "nodeid": "tests/test_packaging.py::test_version_matches_expected_version",
@@ -196,7 +292,7 @@
           "nodeid": "tests/test_packaging.py::test_module_is_importable",
           "name": "test_module_is_importable",
           "markers": [],
-          "source": "def test_module_is_importable():\n    assert callable(googletrans.Translator)\n    assert \"Translator\" in googletrans.__all__",
+          "source": "def test_module_is_importable():\n    assert callable(googletrans.Translator)\n    assert callable(googletrans.SyncTranslator)\n    assert \"Translator\" in googletrans.__all__\n    assert \"SyncTranslator\" in googletrans.__all__\n    assert \"TranslationError\" in googletrans.__all__\n    assert \"RateLimitError\" in googletrans.__all__",
           "outcome": "passed",
           "duration": 0.0
         },
@@ -206,7 +302,7 @@
           "markers": [],
           "source": "def test_module_version_matches_distribution(target_distribution):\n    assert googletrans.__version__ == target_distribution.version",
           "outcome": "passed",
-          "duration": 0.001
+          "duration": 0.0
         }
       ]
     },
@@ -222,7 +318,17 @@
           ],
           "source": "async def test_translate_english_to_german(translator):\n    result = await call_with_retry(lambda: translator.translate(\"Hello, world!\", dest=\"de\"))\n    assert result.src == \"en\"\n    assert result.dest == \"de\"\n    assert result.origin == \"Hello, world!\"\n    assert \"hallo\" in result.text.lower()\n    assert result._response.status_code == 200",
           "outcome": "passed",
-          "duration": 0.203
+          "duration": 0.275
+        },
+        {
+          "nodeid": "tests/test_translate_online.py::test_sync_translate_english_to_german",
+          "name": "test_sync_translate_english_to_german",
+          "markers": [
+            "online"
+          ],
+          "source": "def test_sync_translate_english_to_german(sync_translator):\n    result = call_sync_with_retry(\n        lambda: sync_translator.translate(\"Hello, world!\", dest=\"de\")\n    )\n    assert result.src == \"en\"\n    assert result.dest == \"de\"\n    assert result.origin == \"Hello, world!\"\n    assert \"hallo\" in result.text.lower()",
+          "outcome": "passed",
+          "duration": 0.689
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_with_explicit_source",
@@ -233,7 +339,17 @@
           ],
           "source": "async def test_translate_with_explicit_source(translator):\n    result = await call_with_retry(\n        lambda: translator.translate(\"Guten Morgen\", src=\"de\", dest=\"en\")\n    )\n    assert result.src == \"de\"\n    assert result.dest == \"en\"\n    assert \"morning\" in result.text.lower()",
           "outcome": "passed",
-          "duration": 0.219
+          "duration": 0.269
+        },
+        {
+          "nodeid": "tests/test_translate_online.py::test_sync_translate_with_explicit_source",
+          "name": "test_sync_translate_with_explicit_source",
+          "markers": [
+            "online"
+          ],
+          "source": "def test_sync_translate_with_explicit_source(sync_translator):\n    result = call_sync_with_retry(\n        lambda: sync_translator.translate(\"Guten Morgen\", src=\"de\", dest=\"en\")\n    )\n    assert result.src == \"de\"\n    assert result.dest == \"en\"\n    assert \"morning\" in result.text.lower()",
+          "outcome": "passed",
+          "duration": 0.505
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_destination_by_language_name",
@@ -244,7 +360,7 @@
           ],
           "source": "async def test_translate_destination_by_language_name(translator):\n    result = await call_with_retry(\n        lambda: translator.translate(\"Good morning\", dest=\"german\")\n    )\n    assert result.dest == \"de\"\n    assert \"morgen\" in result.text.lower()",
           "outcome": "passed",
-          "duration": 0.231
+          "duration": 0.184
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_batch_preserves_order",
@@ -255,7 +371,38 @@
           ],
           "source": "async def test_translate_batch_preserves_order(translator):\n    texts = [\"Hello\", \"Thank you\", \"Goodbye\"]\n    results = await call_with_retry(lambda: translator.translate(texts, dest=\"de\"))\n    assert isinstance(results, list)\n    assert [item.origin for item in results] == texts\n    assert \"danke\" in results[1].text.lower()\n    assert all(item.text for item in results)",
           "outcome": "passed",
-          "duration": 1.489
+          "duration": 0.458
+        },
+        {
+          "nodeid": "tests/test_translate_online.py::test_sync_translate_batch_preserves_order",
+          "name": "test_sync_translate_batch_preserves_order",
+          "markers": [
+            "online"
+          ],
+          "source": "def test_sync_translate_batch_preserves_order(sync_translator):\n    texts = [\"Hello\", \"Thank you\", \"Goodbye\"]\n    results = call_sync_with_retry(lambda: sync_translator.translate(texts, dest=\"de\"))\n    assert isinstance(results, list)\n    assert [item.origin for item in results] == texts\n    assert \"danke\" in results[1].text.lower()\n    assert all(item.text for item in results)",
+          "outcome": "passed",
+          "duration": 0.781
+        },
+        {
+          "nodeid": "tests/test_translate_online.py::test_translator_translate_sync_method",
+          "name": "test_translator_translate_sync_method",
+          "markers": [
+            "online"
+          ],
+          "source": "def test_translator_translate_sync_method():\n    from googletrans import Translator\n\n    translator = Translator()\n    result = call_sync_with_retry(lambda: translator.translate_sync(\"Hello\", dest=\"de\"))\n    assert result.dest == \"de\"\n    assert \"hallo\" in result.text.lower()",
+          "outcome": "passed",
+          "duration": 0.366
+        },
+        {
+          "nodeid": "tests/test_translate_online.py::test_translate_explicit_curl_transport",
+          "name": "test_translate_explicit_curl_transport",
+          "markers": [
+            "asyncio",
+            "online"
+          ],
+          "source": "async def test_translate_explicit_curl_transport():\n    from googletrans import Translator\n\n    async with Translator(transport=\"curl\") as t:\n        result = await call_with_retry(lambda: t.translate(\"Hello\", dest=\"de\"))\n        assert \"hallo\" in result.text.lower()",
+          "outcome": "passed",
+          "duration": 0.453
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_non_latin_text",
@@ -266,7 +413,7 @@
           ],
           "source": "async def test_translate_non_latin_text(translator):\n    result = await call_with_retry(lambda: translator.translate(\"你好，世界\", dest=\"en\"))\n    assert result.src.lower() in {\"zh-cn\", \"zh\"}\n    assert \"hello\" in result.text.lower()",
           "outcome": "passed",
-          "duration": 0.186
+          "duration": 0.341
         },
         {
           "nodeid": "tests/test_translate_online.py::test_translate_round_trip",
@@ -277,7 +424,7 @@
           ],
           "source": "async def test_translate_round_trip(translator):\n    german = await call_with_retry(\n        lambda: translator.translate(\"The weather is nice today.\", dest=\"de\")\n    )\n    back = await call_with_retry(\n        lambda: translator.translate(german.text, src=\"de\", dest=\"en\")\n    )\n    assert \"weather\" in back.text.lower()\n    assert \"today\" in back.text.lower()",
           "outcome": "passed",
-          "duration": 2.197
+          "duration": 0.78
         }
       ]
     }

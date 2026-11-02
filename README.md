@@ -9,8 +9,9 @@ Release-gate test harness for the [googletrans-curl](https://github.com/kreier/g
 PyPI package - a fork of [py-googletrans](https://github.com/ssut/py-googletrans).
 
 The fork is published on PyPI as [googletrans-curl](https://pypi.org/project/googletrans-curl/)
-**4.0.3**. The import name remains `googletrans`; since 4.0 the API is async
-(`await Translator().translate(...)`).
+**4.1.0**. The import name remains `googletrans`; the API supports both async
+(`await Translator().translate(...)`) and synchronous workflows
+(`SyncTranslator().translate(...)` or `Translator().translate_sync(...)`).
 
 **Live test report: https://flynn0.github.io/googletrans-curl-tester/** -
 summary cards per outcome plus expandable per-test details (source, markers,
@@ -23,12 +24,12 @@ python -m venv .venv
 
 # On POSIX (Linux / macOS):
 .venv/bin/python -m pip install -r requirements-test.txt
-.venv/bin/python scripts/install_target.py pypi --version 4.0.3
+.venv/bin/python scripts/install_target.py pypi --version 4.1.0
 .venv/bin/python -m pytest
 
 # On Windows:
 .venv\Scripts\python -m pip install -r requirements-test.txt
-.venv\Scripts\python scripts/install_target.py pypi --version 4.0.3
+.venv\Scripts\python scripts/install_target.py pypi --version 4.1.0
 .venv\Scripts\python -m pytest
 ```
 
@@ -49,16 +50,14 @@ Useful invocations:
 ```bash
 python -m pytest --offline                  # skip network tests
 python -m pytest -m online                  # only network tests
-python -m pytest --expected-version 4.0.3   # release gate
+python -m pytest --expected-version 4.1.0   # release gate
 ```
 
-## Current status (verified 2026-10-08 against the published PyPI package)
+## Current status (verified against the published PyPI package 4.1.0)
 
-- `googletrans-curl 4.0.3` installs and imports cleanly; real translations and
-  language detection work - the full suite is **24 passed**
-- both pre-release defects are fixed, so their `xfail(strict=True)` markers are
-  gone: `googletrans.__version__` now matches the distribution metadata, and
-  the `translate` console script runs (`--help` and a real translation)
+- `googletrans-curl 4.1.0` installs and imports cleanly; async and sync translations,
+  language detection, and CLI work cleanly across the full suite
+- both async (`Translator`) and sync (`SyncTranslator`, `Translator.translate_sync`, `Translator.detect_sync`) APIs are tested
 
 ## Installing different sources of the package
 
@@ -66,8 +65,8 @@ python -m pytest --expected-version 4.0.3   # release gate
 | --- | --- |
 | current git main | `python scripts/install_target.py git` |
 | local checkout (test fixes before pushing) | `python scripts/install_target.py local ../googletrans-curl` |
-| built wheel (pre-upload check) | `python scripts/install_target.py wheel dist/googletrans_curl-4.0.3-py3-none-any.whl` |
-| published package | `python scripts/install_target.py pypi --version 4.0.3` |
+| built wheel (pre-upload check) | `python scripts/install_target.py wheel dist/googletrans_curl-4.1.0-py3-none-any.whl` |
+| published package | `python scripts/install_target.py pypi --version 4.1.0` |
 | show what is installed | `python scripts/install_target.py show` |
 
 ## CI
@@ -95,4 +94,4 @@ The [pages workflow](.github/workflows/pages.yml) does this automatically and
 publishes the result to https://flynn0.github.io/googletrans-curl-tester/.
 
 See [AGENTS.md](AGENTS.md) for the agent-oriented workflow, test conventions
-and the 4.0.3 release checklist.
+and the 4.1.0 release checklist.

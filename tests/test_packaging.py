@@ -32,7 +32,11 @@ def test_version_matches_expected_version(target_version, expected_version):
 
 def test_module_is_importable():
     assert callable(googletrans.Translator)
+    assert callable(googletrans.SyncTranslator)
     assert "Translator" in googletrans.__all__
+    assert "SyncTranslator" in googletrans.__all__
+    assert "TranslationError" in googletrans.__all__
+    assert "RateLimitError" in googletrans.__all__
 
 
 def test_module_version_matches_distribution(target_distribution):

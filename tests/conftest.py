@@ -112,6 +112,14 @@ async def translator():
         yield instance
 
 
+@pytest.fixture
+def sync_translator():
+    from googletrans import SyncTranslator
+
+    with SyncTranslator() as instance:
+        yield instance
+
+
 # ---------------------------------------------------------------------------
 # JSON run report for the dashboard (--report-file)
 # ---------------------------------------------------------------------------

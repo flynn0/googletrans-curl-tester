@@ -2,7 +2,15 @@
 
 import pytest
 
-from googletrans import LANGCODES, LANGUAGES, Translator
+from googletrans import (
+    LANGCODES,
+    LANGUAGES,
+    RateLimitError,
+    SyncTranslator,
+    TranslationError,
+    Translator,
+)
+from googletrans.client import _normalize_lang
 from googletrans.models import Detected, Translated
 
 
@@ -23,6 +31,11 @@ async def test_translator_supports_async_context_manager():
         assert isinstance(instance, Translator)
 
 
+def test_sync_translator_supports_context_manager():
+    with SyncTranslator() as instance:
+        assert isinstance(instance, SyncTranslator)
+
+
 async def test_translate_rejects_invalid_destination(translator):
     with pytest.raises(ValueError, match="invalid destination language"):
         await translator.translate("Hello", dest="not-a-language")
@@ -31,6 +44,39 @@ async def test_translate_rejects_invalid_destination(translator):
 async def test_translate_rejects_invalid_source(translator):
     with pytest.raises(ValueError, match="invalid source language"):
         await translator.translate("Hello", src="not-a-language")
+
+
+def test_sync_translate_rejects_invalid_destination(sync_translator):
+    with pytest.raises(ValueError, match="invalid destination language"):
+        sync_translator.translate("Hello", dest="not-a-language")
+
+
+def test_sync_translate_rejects_invalid_source(sync_translator):
+    with pytest.raises(ValueError, match="invalid source language"):
+        sync_translator.translate("Hello", src="not-a-language")
+
+
+def test_translator_rejects_invalid_transport():
+    with pytest.raises(ValueError, match="Invalid transport"):
+        Translator(transport="invalid_transport")
+
+
+def test_sync_translator_rejects_invalid_transport():
+    with pytest.raises(ValueError, match="Invalid transport"):
+        SyncTranslator(transport="invalid_transport")
+
+
+def test_language_normalization():
+    assert _normalize_lang("en_US") == "en"
+    assert _normalize_lang("zh_CN") == "zh-cn"
+    assert _normalize_lang("DE") == "de"
+
+
+def test_exception_hierarchy():
+    assert issubclass(RateLimitError, TranslationError)
+    err = TranslationError("network error", status_code=500)
+    assert err.status_code == 500
+    assert "network error" in str(err)
 
 
 def test_translated_model_contract():

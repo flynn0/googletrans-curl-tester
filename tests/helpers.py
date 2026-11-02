@@ -10,6 +10,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 
@@ -23,6 +24,19 @@ async def call_with_retry(operation, attempts=3, delay=2.0):
             last_error = exc
             if attempt < attempts:
                 await asyncio.sleep(delay)
+    raise last_error
+
+
+def call_sync_with_retry(operation, attempts=3, delay=2.0):
+    """Call operation() synchronously and retry transient network errors a few times."""
+    last_error = None
+    for attempt in range(1, attempts + 1):
+        try:
+            return operation()
+        except Exception as exc:  # noqa: BLE001 - any transport error is worth a retry
+            last_error = exc
+            if attempt < attempts:
+                time.sleep(delay)
     raise last_error
 
 

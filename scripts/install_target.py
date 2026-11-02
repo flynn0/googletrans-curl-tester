@@ -18,8 +18,8 @@ Examples:
   python scripts/install_target.py git
   python scripts/install_target.py git --ref main
   python scripts/install_target.py local ../googletrans-curl
-  python scripts/install_target.py wheel dist/googletrans_curl-4.0.3-py3-none-any.whl
-  python scripts/install_target.py pypi --version 4.0.3
+  python scripts/install_target.py wheel dist/googletrans_curl-4.1.0-py3-none-any.whl
+  python scripts/install_target.py pypi --version 4.1.0
 """
 
 import argparse
@@ -106,7 +106,7 @@ def parse_args(argv):
     git.add_argument("--ref", default=None, help="branch, tag or commit (default: default branch)")
 
     pypi = subparsers.add_parser("pypi", parents=[common], help="install googletrans-curl from PyPI")
-    pypi.add_argument("--version", required=True, help="version to install, e.g. 4.0.3")
+    pypi.add_argument("--version", required=True, help="version to install, e.g. 4.1.0")
 
     local = subparsers.add_parser("local", parents=[common], help="install from a local checkout")
     local.add_argument("path", help="path to the googletrans-curl checkout")

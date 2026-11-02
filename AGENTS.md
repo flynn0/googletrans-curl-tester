@@ -9,10 +9,10 @@ A release-gate test harness for the **googletrans-curl** PyPI package.
 | Fact | Value |
 | --- | --- |
 | Package under test | https://github.com/kreier/googletrans-curl (fork of https://github.com/ssut/py-googletrans) |
-| PyPI project name | `googletrans-curl` - published, latest release **4.0.3** (https://pypi.org/project/googletrans-curl/) |
+| PyPI project name | `googletrans-curl` - published, latest release **4.1.0** (https://pypi.org/project/googletrans-curl/) |
 | Import name | `googletrans` |
-| API style | async since 4.0: `await Translator().translate(...)` |
-| Runtime dependencies | `curl-cffi` and `httpx[http2]` as of the 4.0.3 code base |
+| API style | async (`await Translator().translate(...)`) and sync (`SyncTranslator().translate(...)`, `Translator().translate_sync(...)`) |
+| Runtime dependencies | `curl-cffi` and `httpx[http2]` as of the 4.1.0 code base |
 | This repo | pure test harness - never fix package bugs here, fix them in the fork |
 
 Functional tests talk to the real Google Translate endpoint (marker:
@@ -45,10 +45,10 @@ dashboard/                  Vite app that renders a pytest report as a web page
 python -m venv .venv
 # Windows:
 .venv/Scripts/python -m pip install -r requirements-test.txt
-.venv/Scripts/python scripts/install_target.py pypi --version 4.0.3
+.venv/Scripts/python scripts/install_target.py pypi --version 4.1.0
 # POSIX:
 .venv/bin/python -m pip install -r requirements-test.txt
-.venv/bin/python scripts/install_target.py pypi --version 4.0.3
+.venv/bin/python scripts/install_target.py pypi --version 4.1.0
 ```
 
 That installs the published release - the artifact users get. Use
@@ -66,14 +66,14 @@ installed.
 | Full suite incl. network | `python -m pytest` |
 | Offline only | `python -m pytest --offline` |
 | Network only | `python -m pytest -m online` |
-| Release gate | `python -m pytest --expected-version 4.0.3` |
+| Release gate | `python -m pytest --expected-version 4.1.0` |
 | Write dashboard data | `python -m pytest --report-file dashboard/public/results.json` |
 | Dashboard dev server | `cd dashboard && npm install && npm run dev` |
 | Test the built dashboard | `cd dashboard && npm run build && npm run preview` |
 | Show installed target | `python scripts/install_target.py show` |
 | Test a local fix | `python scripts/install_target.py local ../googletrans-curl` |
-| Test a built wheel | `python scripts/install_target.py wheel dist/googletrans_curl-4.0.3-py3-none-any.whl` |
-| Post-release check | `python scripts/install_target.py pypi --version 4.0.3` |
+| Test a built wheel | `python scripts/install_target.py wheel dist/googletrans_curl-4.1.0-py3-none-any.whl` |
+| Post-release check | `python scripts/install_target.py pypi --version 4.1.0` |
 
 ## How the package under test is installed
 
@@ -92,11 +92,11 @@ Tests accept either distribution name but fail when BOTH are installed
 - async tests need no decorator: pytest-asyncio runs in `auto` mode.
 - any test touching the network MUST carry the `online` marker; offline runs
   (`--offline`) must stay green without network access.
-- use the `translator` fixture and `helpers.call_with_retry` for online calls.
+- use the `translator` or `sync_translator` fixtures and `helpers.call_with_retry` or `helpers.call_sync_with_retry` for online calls.
 - assert stable substrings only (e.g. `"hallo" in result.text.lower()`);
   exact machine-translation output is never stable across time and locale.
 - do not assert on transport internals (httpx/curl-cffi specifics) - the HTTP
-  layer already switched once (4.0.3 uses curl-cffi; the "curl" in the name)
+  layer already switched once (curl-cffi is used for browser impersonation; the "curl" in the name)
   and may change again.
 - conftest.py must not import googletrans at module level; the fixture
   imports it lazily so pytest_configure can raise a friendly UsageError when
@@ -139,27 +139,17 @@ Notes for changes to the dashboard:
 
 ## Defects tracked with xfail(strict=True)
 
-Both pre-release defects are FIXED and verified against the published PyPI
-package (2026-10-08, `googletrans-curl 4.0.3`, full suite 24 passed):
-
-1. the 4.0.3 code base ships `__version__ = "4.0.3"`, matching the metadata
-   (fork commit 90290c8) - the xfail marker on
-   tests/test_packaging.py::test_module_version_matches_distribution was
-   removed to lock the fix in.
-2. the `translate` console script works (`--help` and a real translation) -
-   the xfail markers on both tests/test_cli.py runtime checks were removed.
-
-The suite currently has no xfail tests. If a new defect is found in the fork,
-track it the same way: `xfail(strict=True)` with a reason naming the defect
+Defects are tracked with `xfail(strict=True)` with a reason naming the defect
 and the release expected to fix it, never a weakened assertion. When the fork
 is fixed such a test reports XPASS(strict) and the suite goes red on purpose -
 remove the marker at that point to lock the fix in.
 
+The published 4.1.0 release passes all checks with no xfail tests.
+
 ## Release gate
 
-4.0.3 passed the gate on 2026-10-08 (published at
-https://pypi.org/project/googletrans-curl/4.0.3/). Repeat these steps for the
-next release, substituting the new version:
+4.1.0 is published at https://pypi.org/project/googletrans-curl/4.1.0/. Repeat
+these steps for the next release, substituting the new version:
 
 1. Fix open defects in the fork, not here.
 2. `python scripts/install_target.py local <checkout>` then
