@@ -82,7 +82,9 @@ python -m pytest --expected-version 4.0.3   # release gate
 ## Test dashboard
 
 `dashboard/` is a small Vite app (vanilla JS, no framework) that renders a
-pytest run as a web page. Generate its data with:
+pytest run as a web page with dynamic dark and light mode theme support (featuring
+a one-click header toggle, `localStorage` persistence, and OS color scheme detection).
+Generate its data with:
 
 ```bash
 python -m pytest --report-file dashboard/public/results.json

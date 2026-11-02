@@ -63,6 +63,56 @@ function block(label, text) {
   );
 }
 
+function getTheme() {
+  const saved = localStorage.getItem("theme");
+  if (saved) return saved;
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return prefersDark ? "dark" : "light";
+}
+
+function updateToggleBtn(btn, theme) {
+  const icon = btn.querySelector(".theme-icon");
+  const text = btn.querySelector(".theme-text");
+  if (icon) icon.textContent = theme === "dark" ? "🌙" : "☀️";
+  if (text) text.textContent = theme === "dark" ? "Dark" : "Light";
+}
+
+function themeToggle() {
+  const currentTheme = document.documentElement.getAttribute("data-theme") || getTheme();
+  const btn = el(
+    "button",
+    {
+      id: "theme-toggle",
+      class: "theme-toggle",
+      type: "button",
+      "aria-label": "Toggle color theme",
+      onclick: () => {
+        const active = document.documentElement.getAttribute("data-theme") || getTheme();
+        const next = active === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+        updateToggleBtn(btn, next);
+      },
+    },
+    el("span", { class: "theme-icon", text: currentTheme === "dark" ? "🌙" : "☀️" }),
+    el("span", { class: "theme-text", text: currentTheme === "dark" ? "Dark" : "Light" }),
+  );
+  return btn;
+}
+
+function initThemeListener() {
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+      if (!localStorage.getItem("theme")) {
+        const theme = e.matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", theme);
+        const btn = document.getElementById("theme-toggle");
+        if (btn) updateToggleBtn(btn, theme);
+      }
+    });
+  }
+}
+
 function masthead(data, exit) {
   const env = data.environment ?? {};
   const git = env.git;
@@ -110,10 +160,15 @@ function masthead(data, exit) {
           ").",
         ),
       ),
-      el("span", {
-        class: `exit-pill ${exit === 0 ? "exit-ok" : "exit-bad"}`,
-        text: exit === 0 ? "exit status 0" : `exit status ${exit}`,
-      }),
+      el(
+        "div",
+        { class: "masthead-actions" },
+        themeToggle(),
+        el("span", {
+          class: `exit-pill ${exit === 0 ? "exit-ok" : "exit-bad"}`,
+          text: exit === 0 ? "exit status 0" : `exit status ${exit}`,
+        }),
+      ),
     ),
     el(
       "ul",
@@ -282,10 +337,19 @@ function renderError(app, error) {
         "header",
         { class: "masthead" },
         el(
-          "h1",
-          {},
-          "googletrans-curl ",
-          el("span", { class: "dim", text: "test dashboard" }),
+          "div",
+          { class: "masthead-top" },
+          el(
+            "h1",
+            {},
+            "googletrans-curl ",
+            el("span", { class: "dim", text: "test dashboard" }),
+          ),
+          el(
+            "div",
+            { class: "masthead-actions" },
+            themeToggle(),
+          ),
         ),
       ),
       el(
@@ -303,6 +367,7 @@ function renderError(app, error) {
 }
 
 async function init() {
+  initThemeListener();
   const app = document.getElementById("app");
   try {
     const response = await fetch(DATA_URL, { cache: "no-store" });
