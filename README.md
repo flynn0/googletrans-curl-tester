@@ -1,5 +1,10 @@
 # googletrans-curl-tester
 
+[![tests](https://github.com/flynn0/googletrans-curl-tester/actions/workflows/test.yml/badge.svg)](https://github.com/flynn0/googletrans-curl-tester/actions/workflows/test.yml)
+[![pages](https://github.com/flynn0/googletrans-curl-tester/actions/workflows/pages.yml/badge.svg)](https://github.com/flynn0/googletrans-curl-tester/actions/workflows/pages.yml)
+[![Latest Release](https://img.shields.io/github/v/release/flynn0/googletrans-curl-tester?color=blue)](https://github.com/flynn0/googletrans-curl-tester/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Release-gate test harness for the [googletrans-curl](https://github.com/kreier/googletrans-curl)
 PyPI package - a fork of [py-googletrans](https://github.com/ssut/py-googletrans).
 
@@ -15,12 +20,19 @@ failure output), regenerated on every push to main and nightly.
 
 ```bash
 python -m venv .venv
-# Windows
-.venv/Scripts/python -m pip install -r requirements-test.txt
-.venv/Scripts/python scripts/install_target.py pypi --version 4.0.3
-.venv/Scripts/python -m pytest
-# POSIX: replace .venv/Scripts with .venv/bin
+
+# On POSIX (Linux / macOS):
+.venv/bin/python -m pip install -r requirements-test.txt
+.venv/bin/python scripts/install_target.py pypi --version 4.0.3
+.venv/bin/python -m pytest
+
+# On Windows:
+.venv\Scripts\python -m pip install -r requirements-test.txt
+.venv\Scripts\python scripts/install_target.py pypi --version 4.0.3
+.venv\Scripts\python -m pytest
 ```
+
+Alternatively, activate the virtual environment first (`source .venv/bin/activate` on POSIX or `.venv\Scripts\activate` on Windows), and run `python scripts/install_target.py ...` and `pytest` directly.
 
 ## What the suite covers
 
