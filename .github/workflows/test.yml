@@ -24,12 +24,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        # ubuntu-latest (Ubuntu 26.04) dropped Python 3.9 from GitHub's runner toolcache;
+        # ubuntu-24.04 retains prebuilt binaries for Python 3.9 through 3.13.
+        os: [ubuntu-24.04, windows-latest]
         python: ["3.9", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
       - name: Install test dependencies
@@ -43,8 +45,8 @@ jobs:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install test dependencies
