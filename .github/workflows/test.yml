@@ -16,7 +16,7 @@ on:
 env:
   # Published release installed by the online job; the offline job tracks the
   # fork's git main so fork changes are caught before the next release.
-  RELEASED_VERSION: "4.1.0"
+  RELEASED_VERSION: "4.1.1"
 
 jobs:
   offline:

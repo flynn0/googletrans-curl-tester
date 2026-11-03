@@ -38,3 +38,12 @@ def test_translate_cli_detects_language():
     proc = run_console_script(script, ["Bonjour tout le monde", "-c"])
     assert proc.returncode == 0, proc.stderr
     assert "fr" in proc.stdout.lower()
+
+
+@pytest.mark.online
+def test_translate_cli_translates_with_ipv4():
+    script = find_console_script("translate")
+    assert script is not None, "console script 'translate' is not installed"
+    proc = run_console_script(script, ["Hello world", "-d", "de", "-4"])
+    assert proc.returncode == 0, proc.stderr
+    assert "hallo" in proc.stdout.lower()

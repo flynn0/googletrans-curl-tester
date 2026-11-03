@@ -2,7 +2,7 @@ import "./style.css";
 
 const DATA_URL = `${import.meta.env.BASE_URL}results.json`;
 const HISTORY_URL = `${import.meta.env.BASE_URL}history.json`;
-const RELEASE_VERSION = "0.2.0";
+const RELEASE_VERSION = "0.2.1";
 
 const OUTCOME_LABELS = {
   passed: "passed",

@@ -9,9 +9,10 @@ Release-gate test harness for the [googletrans-curl](https://github.com/kreier/g
 PyPI package - a fork of [py-googletrans](https://github.com/ssut/py-googletrans).
 
 The fork is published on PyPI as [googletrans-curl](https://pypi.org/project/googletrans-curl/)
-**4.1.0**. The import name remains `googletrans`; the API supports both async
+**4.1.1**. The import name remains `googletrans`; the API supports both async
 (`await Translator().translate(...)`) and synchronous workflows
-(`SyncTranslator().translate(...)` or `Translator().translate_sync(...)`).
+(`SyncTranslator().translate(...)` or `Translator().translate_sync(...)`),
+along with IPv4 resolution options (`ipv4=True` / `--ipv4`), custom `curl_options`, and exported `CurlOpt`.
 
 **Live test report: https://flynn0.github.io/googletrans-curl-tester/** -
 summary cards per outcome plus expandable per-test details (source, markers,
@@ -24,12 +25,12 @@ python -m venv .venv
 
 # On POSIX (Linux / macOS):
 .venv/bin/python -m pip install -r requirements-test.txt
-.venv/bin/python scripts/install_target.py pypi --version 4.1.0
+.venv/bin/python scripts/install_target.py pypi --version 4.1.1
 .venv/bin/python -m pytest
 
 # On Windows:
 .venv\Scripts\python -m pip install -r requirements-test.txt
-.venv\Scripts\python scripts/install_target.py pypi --version 4.1.0
+.venv\Scripts\python scripts/install_target.py pypi --version 4.1.1
 .venv\Scripts\python -m pytest
 ```
 
@@ -50,13 +51,13 @@ Useful invocations:
 ```bash
 python -m pytest --offline                  # skip network tests
 python -m pytest -m online                  # only network tests
-python -m pytest --expected-version 4.1.0   # release gate
+python -m pytest --expected-version 4.1.1   # release gate
 ```
 
-## Current status (verified against the published PyPI package 4.1.0)
+## Current status (verified against the published PyPI package 4.1.1)
 
-- `googletrans-curl 4.1.0` installs and imports cleanly; async and sync translations,
-  language detection, and CLI work cleanly across the full suite
+- `googletrans-curl 4.1.1` installs and imports cleanly; async and sync translations,
+  IPv4 DNS resolution options, `CurlOpt`, language detection, and CLI work cleanly across the full suite
 - both async (`Translator`) and sync (`SyncTranslator`, `Translator.translate_sync`, `Translator.detect_sync`) APIs are tested
 
 ## Installing different sources of the package
@@ -65,8 +66,8 @@ python -m pytest --expected-version 4.1.0   # release gate
 | --- | --- |
 | current git main | `python scripts/install_target.py git` |
 | local checkout (test fixes before pushing) | `python scripts/install_target.py local ../googletrans-curl` |
-| built wheel (pre-upload check) | `python scripts/install_target.py wheel dist/googletrans_curl-4.1.0-py3-none-any.whl` |
-| published package | `python scripts/install_target.py pypi --version 4.1.0` |
+| built wheel (pre-upload check) | `python scripts/install_target.py wheel dist/googletrans_curl-4.1.1-py3-none-any.whl` |
+| published package (latest or pinned) | `python scripts/install_target.py pypi` (or `--version 4.1.1`) |
 | show what is installed | `python scripts/install_target.py show` |
 
 ## CI
@@ -80,7 +81,7 @@ python -m pytest --expected-version 4.1.0   # release gate
 
 ## Test dashboard
 
-`dashboard/` is a Vite app (vanilla JS, no framework, release **v0.2.0**) that renders
+`dashboard/` is a Vite app (vanilla JS, no framework, release **v0.2.1**) that renders
 test runs and continuous health indicators as a web page:
 - **Theme support**: dynamic dark and light mode with a one-click header toggle, `localStorage` persistence, and OS color scheme detection.
 - **Test run history database**: tracks recent and future test executions across GitHub Actions workflows and local pytest runs in `history.json`.
@@ -99,4 +100,4 @@ The [pages workflow](.github/workflows/pages.yml) does this automatically and
 publishes the result to https://flynn0.github.io/googletrans-curl-tester/.
 
 See [AGENTS.md](AGENTS.md) for the agent-oriented workflow, test conventions
-and the 4.1.0 release checklist.
+and the 4.1.1 release checklist.

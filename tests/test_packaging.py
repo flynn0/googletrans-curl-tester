@@ -41,3 +41,9 @@ def test_module_is_importable():
 
 def test_module_version_matches_distribution(target_distribution):
     assert googletrans.__version__ == target_distribution.version
+
+
+def test_curl_opt_exported_in_4_1_1(target_version):
+    if target_version >= Version("4.1.1"):
+        assert "CurlOpt" in googletrans.__all__
+        assert hasattr(googletrans, "CurlOpt")

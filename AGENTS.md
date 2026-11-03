@@ -9,10 +9,10 @@ A release-gate test harness for the **googletrans-curl** PyPI package.
 | Fact | Value |
 | --- | --- |
 | Package under test | https://github.com/kreier/googletrans-curl (fork of https://github.com/ssut/py-googletrans) |
-| PyPI project name | `googletrans-curl` - published, latest release **4.1.0** (https://pypi.org/project/googletrans-curl/) |
+| PyPI project name | `googletrans-curl` - published, latest release **4.1.1** (https://pypi.org/project/googletrans-curl/) |
 | Import name | `googletrans` |
 | API style | async (`await Translator().translate(...)`) and sync (`SyncTranslator().translate(...)`, `Translator().translate_sync(...)`) |
-| Runtime dependencies | `curl-cffi` and `httpx[http2]` as of the 4.1.0 code base |
+| Runtime dependencies | `curl-cffi` and `httpx[http2]` as of the 4.1.1 code base |
 | This repo | pure test harness - never fix package bugs here, fix them in the fork |
 
 Functional tests talk to the real Google Translate endpoint (marker:
@@ -34,7 +34,7 @@ tests/
 scripts/install_target.py   installs the package under test (git/local/wheel/pypi)
 scripts/update_history.py   tracks historical and future runs in history.json
 history.json                root database of test runs since repo creation
-dashboard/                  Vite app (v0.2.0) that renders report, heatmap, and tickbar
+dashboard/                  Vite app (v0.2.1) that renders report, heatmap, and tickbar
   src/                      main.js + style.css (no framework)
   public/results.json       latest report data consumed by the app
   public/history.json       run history database consumed by the heatmap & tickbar
@@ -48,10 +48,10 @@ dashboard/                  Vite app (v0.2.0) that renders report, heatmap, and 
 python -m venv .venv
 # Windows:
 .venv/Scripts/python -m pip install -r requirements-test.txt
-.venv/Scripts/python scripts/install_target.py pypi --version 4.1.0
+.venv/Scripts/python scripts/install_target.py pypi --version 4.1.1
 # POSIX:
 .venv/bin/python -m pip install -r requirements-test.txt
-.venv/bin/python scripts/install_target.py pypi --version 4.1.0
+.venv/bin/python scripts/install_target.py pypi --version 4.1.1
 ```
 
 That installs the published release - the artifact users get. Use
@@ -69,7 +69,7 @@ installed.
 | Full suite incl. network | `python -m pytest` |
 | Offline only | `python -m pytest --offline` |
 | Network only | `python -m pytest -m online` |
-| Release gate | `python -m pytest --expected-version 4.1.0` |
+| Release gate | `python -m pytest --expected-version 4.1.1` |
 | Write dashboard data | `python -m pytest --report-file dashboard/public/results.json` |
 | Sync run history database | `python scripts/update_history.py` |
 | Show history statistics | `python scripts/update_history.py --show` |
@@ -77,8 +77,8 @@ installed.
 | Test the built dashboard | `cd dashboard && npm run build && npm run preview` |
 | Show installed target | `python scripts/install_target.py show` |
 | Test a local fix | `python scripts/install_target.py local ../googletrans-curl` |
-| Test a built wheel | `python scripts/install_target.py wheel dist/googletrans_curl-4.1.0-py3-none-any.whl` |
-| Post-release check | `python scripts/install_target.py pypi --version 4.1.0` |
+| Test a built wheel | `python scripts/install_target.py wheel dist/googletrans_curl-4.1.1-py3-none-any.whl` |
+| Post-release check | `python scripts/install_target.py pypi --version 4.1.1` |
 
 ## How the package under test is installed
 
@@ -149,11 +149,11 @@ and the release expected to fix it, never a weakened assertion. When the fork
 is fixed such a test reports XPASS(strict) and the suite goes red on purpose -
 remove the marker at that point to lock the fix in.
 
-The published 4.1.0 release passes all checks with no xfail tests.
+The published 4.1.1 release passes all checks with no xfail tests.
 
 ## Release gate
 
-4.1.0 is published at https://pypi.org/project/googletrans-curl/4.1.0/. Repeat
+4.1.1 is published at https://pypi.org/project/googletrans-curl/4.1.1/. Repeat
 these steps for the next release, substituting the new version:
 
 1. Fix open defects in the fork, not here.

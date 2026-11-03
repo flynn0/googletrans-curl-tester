@@ -106,3 +106,19 @@ async def test_translate_round_trip(translator):
     )
     assert "weather" in back.text.lower()
     assert "today" in back.text.lower()
+
+
+async def test_translate_ipv4_option():
+    from googletrans import Translator
+
+    async with Translator(ipv4=True) as t:
+        result = await call_with_retry(lambda: t.translate("Hello", dest="de"))
+        assert "hallo" in result.text.lower()
+
+
+def test_sync_translate_ipv4_option():
+    from googletrans import SyncTranslator
+
+    with SyncTranslator(ipv4=True) as t:
+        result = call_sync_with_retry(lambda: t.translate("Hello", dest="de"))
+        assert "hallo" in result.text.lower()

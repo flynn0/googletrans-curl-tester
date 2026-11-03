@@ -1,14 +1,14 @@
 {
   "version": "1.0",
   "repository": "flynn0/googletrans-curl-tester",
-  "last_updated": "2026-11-02T08:37:30+00:00",
+  "last_updated": "2026-11-03T09:11:08+00:00",
   "summary": {
-    "total_runs": 79,
-    "successful_runs": 72,
+    "total_runs": 84,
+    "successful_runs": 77,
     "failed_runs": 7,
-    "success_rate": 91.1,
+    "success_rate": 91.7,
     "first_run": "2026-10-07T17:15:40Z",
-    "latest_run": "2026-11-02T08:37:30+00:00"
+    "latest_run": "2026-11-03T09:11:02+00:00"
   },
   "runs": [
     {
@@ -1161,6 +1161,86 @@
       "summary": {
         "total": 45,
         "passed": 45,
+        "failed": 0,
+        "skipped": 0,
+        "xfailed": 0,
+        "xpassed": 0
+      }
+    },
+    {
+      "id": "41416119594",
+      "workflow": "tests",
+      "name": "tests",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-02T08:51:37Z",
+      "updated_at": "2026-11-02T08:52:58Z",
+      "duration": 81,
+      "commit": "fe8c51e",
+      "branch": "main",
+      "url": "https://github.com/flynn0/googletrans-curl-tester/actions/runs/41416119594"
+    },
+    {
+      "id": "41416119299",
+      "workflow": "pages",
+      "name": "pages",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-02T08:51:37Z",
+      "updated_at": "2026-11-02T08:52:17Z",
+      "duration": 40,
+      "commit": "fe8c51e",
+      "branch": "main",
+      "url": "https://github.com/flynn0/googletrans-curl-tester/actions/runs/41416119299"
+    },
+    {
+      "id": "41605224519",
+      "workflow": "tests",
+      "name": "tests",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-03T08:42:04Z",
+      "updated_at": "2026-11-03T08:42:44Z",
+      "duration": 40,
+      "commit": "fe8c51e",
+      "branch": "main",
+      "url": "https://github.com/flynn0/googletrans-curl-tester/actions/runs/41605224519"
+    },
+    {
+      "id": "41605730160",
+      "workflow": "pages",
+      "name": "pages",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-03T08:46:06Z",
+      "updated_at": "2026-11-03T08:46:45Z",
+      "duration": 39,
+      "commit": "fe8c51e",
+      "branch": "main",
+      "url": "https://github.com/flynn0/googletrans-curl-tester/actions/runs/41605730160"
+    },
+    {
+      "id": "pytest-fe8c51e-20261103T091102+0000",
+      "workflow": "local-pytest",
+      "name": "pytest (full)",
+      "event": "manual",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-03T09:11:02+00:00",
+      "updated_at": "2026-11-03T09:11:02+00:00",
+      "duration": 13.1,
+      "commit": "fe8c51e",
+      "branch": "main",
+      "url": null,
+      "expected_version": "4.1.1",
+      "target": "googletrans-curl 4.1.1",
+      "summary": {
+        "total": 49,
+        "passed": 49,
         "failed": 0,
         "skipped": 0,
         "xfailed": 0,

@@ -18,7 +18,7 @@ concurrency:
 
 env:
   # The dashboard reports on the published release people install.
-  RELEASED_VERSION: "4.1.0"
+  RELEASED_VERSION: "4.1.1"
 
 jobs:
   build-deploy:

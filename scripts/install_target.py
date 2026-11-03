@@ -11,15 +11,15 @@ Modes:
                (default branch, or --ref <branch|tag|sha>)
   local PATH   install from a local checkout (test fixes before pushing)
   wheel PATH   install a built wheel (test the exact artifact before upload)
-  pypi         install googletrans-curl from PyPI (--version required)
+  pypi         install googletrans-curl from PyPI (--version optional, default: latest)
   show         report which target distribution is currently installed
 
 Examples:
   python scripts/install_target.py git
   python scripts/install_target.py git --ref main
   python scripts/install_target.py local ../googletrans-curl
-  python scripts/install_target.py wheel dist/googletrans_curl-4.1.0-py3-none-any.whl
-  python scripts/install_target.py pypi --version 4.1.0
+  python scripts/install_target.py wheel dist/googletrans_curl-4.1.1-py3-none-any.whl
+  python scripts/install_target.py pypi --version 4.1.1
 """
 
 import argparse
@@ -68,7 +68,7 @@ def target_spec(args):
         ref = f"@{args.ref}" if args.ref else ""
         return f"git+{GIT_URL}{ref}"
     if args.mode == "pypi":
-        return f"googletrans-curl=={args.version}"
+        return f"googletrans-curl=={args.version}" if args.version else "googletrans-curl"
     if args.mode == "local":
         path = Path(args.path).resolve()
         if not (path / "pyproject.toml").is_file() and not (path / "setup.py").is_file():
@@ -106,7 +106,7 @@ def parse_args(argv):
     git.add_argument("--ref", default=None, help="branch, tag or commit (default: default branch)")
 
     pypi = subparsers.add_parser("pypi", parents=[common], help="install googletrans-curl from PyPI")
-    pypi.add_argument("--version", required=True, help="version to install, e.g. 4.1.0")
+    pypi.add_argument("--version", default=None, help="version to install (default: latest published on PyPI)")
 
     local = subparsers.add_parser("local", parents=[common], help="install from a local checkout")
     local.add_argument("path", help="path to the googletrans-curl checkout")

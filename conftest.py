@@ -24,7 +24,7 @@ def pytest_addoption(parser):
         metavar="VERSION",
         help=(
             "fail unless the installed target reports exactly VERSION; "
-            "use as a release gate, e.g. --expected-version 4.1.0"
+            "use as a release gate, e.g. --expected-version 4.1.1"
         ),
     )
     parser.addoption(
