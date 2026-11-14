@@ -2,7 +2,7 @@ import "./style.css";
 
 const DATA_URL = `${import.meta.env.BASE_URL}results.json`;
 const HISTORY_URL = `${import.meta.env.BASE_URL}history.json`;
-const RELEASE_VERSION = "0.2.1";
+const RELEASE_VERSION = "0.2.2";
 
 const OUTCOME_LABELS = {
   passed: "passed",
@@ -580,9 +580,11 @@ function heatmapSection(history) {
   }
 
   // Earliest date (at least Oct 7, 2026) and latest date (at least today)
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const minDateStr = "2026-10-07";
   const dateKeys = Object.keys(byDate).sort();
-  const firstDateStr = dateKeys[0] || "2026-10-07";
-  const lastDateStr = dateKeys[dateKeys.length - 1] || new Date().toISOString().slice(0, 10);
+  const firstDateStr = dateKeys.length > 0 && dateKeys[0] < minDateStr ? dateKeys[0] : minDateStr;
+  const lastDateStr = dateKeys.length > 0 && dateKeys[dateKeys.length - 1] > todayStr ? dateKeys[dateKeys.length - 1] : todayStr;
 
   const firstDate = parseUtcDate(firstDateStr);
   const lastDate = parseUtcDate(lastDateStr);

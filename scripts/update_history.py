@@ -13,6 +13,7 @@ Usage:
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -70,16 +71,22 @@ def recompute_summary(data: dict) -> dict:
 def sync_from_github(data: dict, limit: int = 300) -> int:
     """Fetch recent and past runs using the GitHub CLI (gh)."""
     try:
+        env = os.environ.copy()
+        if "GH_TOKEN" not in env and "GITHUB_TOKEN" in env:
+            env["GH_TOKEN"] = env["GITHUB_TOKEN"]
+        repo = data.get("repository") or "flynn0/googletrans-curl-tester"
         cmd = [
             "gh",
             "run",
             "list",
+            "--repo",
+            repo,
             "--limit",
             str(limit),
             "--json",
             "databaseId,name,workflowName,status,conclusion,event,createdAt,updatedAt,headSha,headBranch,url",
         ]
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True, env=env)
         raw_runs = json.loads(proc.stdout)
     except (subprocess.SubprocessError, FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Notice: unable to query GitHub Actions runs ({e})", file=sys.stderr)

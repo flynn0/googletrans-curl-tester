@@ -34,7 +34,7 @@ tests/
 scripts/install_target.py   installs the package under test (git/local/wheel/pypi)
 scripts/update_history.py   tracks historical and future runs in history.json
 history.json                root database of test runs since repo creation
-dashboard/                  Vite app (v0.2.1) that renders report, heatmap, and tickbar
+dashboard/                  Vite app (v0.2.2) that renders report, heatmap, and tickbar
   src/                      main.js + style.css (no framework)
   public/results.json       latest report data consumed by the app
   public/history.json       run history database consumed by the heatmap & tickbar
